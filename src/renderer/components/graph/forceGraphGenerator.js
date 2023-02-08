@@ -1,12 +1,7 @@
 import * as d3 from 'd3';
 import { CONSTANTS } from './forceGraph.constants.js';
 
-export function runForceGraph(
-  container,
-  linksData,
-  nodesData,
-  nodeHoverTooltip
-) {
+export function runForceGraph(container, linksData, nodesData) {
   const links = linksData.map((d) => Object.assign({}, d));
   const nodes = nodesData.map((d) => Object.assign({}, d));
 
@@ -69,24 +64,6 @@ export function runForceGraph(
         el._groups[0][i].classList.remove('hi');
       }
     });
-  };
-
-  const addTooltip = (hoverTooltip, d, x, y) => {
-    div
-      .transition()
-      .duration(CONSTANTS.tooltip.transition.duration)
-      .style('opacity', CONSTANTS.tooltip.opacity);
-    div
-      .html(hoverTooltip(d))
-      .style('left', `${x + CONSTANTS.tooltip.offset.x}px`)
-      .style('top', `${y + CONSTANTS.tooltip.offset.y}px`);
-  };
-
-  const removeTooltip = () => {
-    div
-      .transition()
-      .duration(CONSTANTS.tooltip.transition.duration)
-      .style('opacity', 0);
   };
 
   const simulation = d3
@@ -204,10 +181,10 @@ export function runForceGraph(
 
   label
     .on('mouseover', (e, d) => {
-      addTooltip(nodeHoverTooltip, d, e.pageX, e.pageY);
+      //addTooltip(nodeHoverTooltip, d, e.pageX, e.pageY);
     })
     .on('mouseout', () => {
-      removeTooltip();
+      //removeTooltip();
     });
 
   simulation.on('tick', () => {

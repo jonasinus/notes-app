@@ -1,13 +1,9 @@
 import React from 'react';
 import { runForceGraph } from './forceGraphGenerator';
 
-export function ForceGraph({
-  linksData,
-  nodesData,
-  nodeHoverTooltip,
-  navOpen,
-}) {
+export function ForceGraph({ linksData, nodesData, navOpen }) {
   const containerRef = React.useRef(null);
+  console.log(nodesData, linksData);
 
   React.useEffect(() => {
     let destroyFn;
@@ -16,8 +12,7 @@ export function ForceGraph({
       const { destroy } = runForceGraph(
         containerRef.current,
         linksData,
-        nodesData,
-        nodeHoverTooltip
+        nodesData
       );
       destroyFn = destroy;
     }

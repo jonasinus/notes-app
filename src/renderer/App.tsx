@@ -2,6 +2,7 @@ import { FC, useRef, useState } from 'react';
 import reactLogo from './assets/react.svg';
 import './App.css';
 import { mainModule } from 'process';
+import { ForceGraph } from './components/graph';
 
 interface tabheader {
   title: string;
@@ -9,6 +10,9 @@ interface tabheader {
 }
 
 function App() {
+  return (
+    <ForceGraph linksData={data.links} nodesData={data.nodes} navOpen={true} />
+  );
   const [sideBarCollapsed, setSideBarCollapsed] = useState(false);
   const [mode, setMode] = useState<'file' | 'graph'>('file');
   const [tabs, setTabs] = useState<tabheader[]>([
@@ -47,10 +51,14 @@ function App() {
         <nav id="mainNav" data-collapsed={sideBarCollapsed}>
           <ul>
             <li>
-              <button type="button">sr</button>
+              <button type="button" onClick={(e) => setMode('file')}>
+                sr
+              </button>
             </li>
             <li>
-              <button type="button">gv</button>
+              <button type="button" onClick={(e) => setMode('graph')}>
+                gv
+              </button>
             </li>
             <li>
               <button type="button">cl</button>
@@ -75,7 +83,7 @@ function App() {
           <div>a</div>
         </menu>
         <main id="mainWorkspace" className="file" data-mode={mode}>
-          {mode === 'file' ? <Tab initialValue="" /> : <main></main>}
+          {mode === 'file' ? <Tab initialValue="" /> : <Graph />}
         </main>
       </div>
     </>
@@ -128,17 +136,159 @@ const Tab: React.FC<Props> = ({ initialValue }) => {
   );
 };
 
-const Graph = ({
-  nodes,
-  settings,
-}: {
-  nodes: node[];
-  settings: {};
-}): JSX.Element => {
+const Graph = (): JSX.Element => {
   return <div></div>;
 };
 
 type node = {
   label: string;
   hover: string;
+  linksTo: number;
+  id: number;
+};
+
+export let data = {
+  nodes: [
+    {
+      id: 1,
+      label: 'Graph view',
+
+      importance: 1,
+    },
+    {
+      id: 2,
+      label: 'Internal link',
+
+      importance: 0.6,
+    },
+    {
+      id: 3,
+      label: 'Use callouts',
+
+      importance: 0.6,
+    },
+    {
+      id: 4,
+      label: 'Link notes',
+
+      importance: 0.6,
+    },
+    {
+      id: 5,
+      label: 'Format your notes',
+
+      importance: 0.6,
+    },
+    {
+      id: 6,
+      label: 'Working with multiple notes',
+
+      importance: 0.6,
+    },
+    {
+      id: 7,
+      label: 'Obsidian',
+
+      importance: 0.6,
+    },
+    {
+      id: 8,
+      label: 'Ribbon',
+
+      importance: 0.6,
+    },
+    {
+      id: 9,
+      label: 'Pane Layout',
+
+      importance: 0.6,
+    },
+    {
+      id: 10,
+      label: 'Search',
+
+      importance: 0.6,
+    },
+    {
+      id: 11,
+      label: 'Add custom Styles',
+
+      importance: 0.6,
+    },
+  ],
+  links: [
+    {
+      source: 1,
+      target: 2,
+    },
+    {
+      source: 1,
+      target: 3,
+    },
+    {
+      source: 1,
+      target: 4,
+    },
+
+    {
+      source: 1,
+      target: 5,
+    },
+    {
+      source: 1,
+      target: 6,
+    },
+    {
+      source: 1,
+      target: 7,
+    },
+    {
+      source: 1,
+      target: 8,
+    },
+    {
+      source: 1,
+      target: 9,
+    },
+    {
+      source: 1,
+      target: 10,
+    },
+    {
+      source: 1,
+      target: 11,
+    },
+    {
+      source: 2,
+      target: 3,
+    },
+    {
+      source: 2,
+      target: 5,
+    },
+    {
+      source: 2,
+      target: 7,
+    },
+    {
+      source: 3,
+      target: 5,
+    },
+    {
+      source: 5,
+      target: 7,
+    },
+    {
+      source: 5,
+      target: 10,
+    },
+    {
+      source: 6,
+      target: 9,
+    },
+    {
+      source: 6,
+      target: 10,
+    },
+  ],
 };

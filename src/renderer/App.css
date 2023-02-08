@@ -73,7 +73,7 @@ button {
   /*margin: 0;*/
   padding: 0;
   box-sizing: border-box;
-  transition: 500ms;
+  /*transition: 500ms;*/
 }
 
 #titleBar {
@@ -211,4 +211,18 @@ button {
   display: flex;
   gap: 10px;
   padding: 0 10px;
+}
+
+.graph {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid red;
+}
+
+.graph .fg {
+  border: 1px solid red;
+  width: 50vw;
+  height: 100%;
 }
