@@ -1,6 +1,7 @@
 import { FC, useRef, useState } from 'react';
 import reactLogo from './assets/react.svg';
 import './App.css';
+import { mainModule } from 'process';
 
 interface tabheader {
   title: string;
@@ -9,6 +10,7 @@ interface tabheader {
 
 function App() {
   const [sideBarCollapsed, setSideBarCollapsed] = useState(false);
+  const [mode, setMode] = useState<'file' | 'graph'>('file');
   const [tabs, setTabs] = useState<tabheader[]>([
     { title: 'hello world', open: true },
     { title: 'second tab', open: false },
@@ -72,8 +74,8 @@ function App() {
           </div>
           <div>a</div>
         </menu>
-        <main id="mainWorkspace">
-          <Tab edit="**hello**" parsed="<strong>hello</strong>" />
+        <main id="mainWorkspace" className="file" data-mode={mode}>
+          {mode === 'file' ? <Tab initialValue="" /> : <main></main>}
         </main>
       </div>
     </>
@@ -82,51 +84,61 @@ function App() {
 
 export default App;
 
-function Tab({ edit, parsed }: { edit: string; parsed: string }) {
-  const [editmode, setEditmode] = useState(true);
-  const editContainerRef = useRef<HTMLTextAreaElement>(null);
-  const viewContainerRef = useRef<HTMLDivElement>(null);
+interface Props {
+  initialValue: string;
+}
 
-  function EditContainer({ text }: { text: string }) {
-    return (
-      <textarea
-        defaultValue={text}
-        ref={editContainerRef}
-        onChange={(e) => (edit = e.currentTarget.value)}
-      ></textarea>
-    );
-  }
+const Tab: React.FC<Props> = ({ initialValue }) => {
+  const [mode, setMode] = useState<'edit' | 'view'>('edit');
+  const [editValue, setEditValue] = useState(initialValue);
+  const [viewValue, setViewValue] = useState('');
 
-  function ViewContainer({ text }: { text: string }) {
-    return (
-      <div
-        dangerouslySetInnerHTML={{ __html: text }}
-        ref={viewContainerRef}
-      ></div>
-    );
-  }
+  const handleValueChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setEditValue(event.target.value);
+    setViewValue(parse(event.target.value));
+  };
 
-  function parseEditString(s: string): string {
-    return s;
+  function parse(s: string): string {
+    return s.replace(/(\*\*)(.*?)(\*\*)/g, '<strong>$2</strong>');
   }
 
   return (
-    <div className="tab">
-      <nav className="tabNav">
-        <button
-          onClick={(e) => setEditmode(!editmode)}
-          className="toggleModeButton"
-        >
-          {editmode ? 'view' : 'edit'}
+    <div>
+      <nav className="tab-nav">
+        <button onClick={() => setMode(mode === 'edit' ? 'view' : 'edit')}>
+          {mode === 'edit' ? 'View' : 'Edit'}
         </button>
+        <button>localGraph</button>
       </nav>
-      <div>
-        {editmode ? (
-          <EditContainer text={edit} />
-        ) : (
-          <ViewContainer text={parseEditString(edit)} />
-        )}
-      </div>
+      {mode === 'edit' ? (
+        <textarea
+          value={editValue}
+          onChange={handleValueChange}
+          className="tab-edit-container"
+        />
+      ) : (
+        <div
+          dangerouslySetInnerHTML={{
+            __html: viewValue.length === 0 ? 'this file is empty' : viewValue,
+          }}
+          className="tab-view-container"
+        />
+      )}
     </div>
   );
-}
+};
+
+const Graph = ({
+  nodes,
+  settings,
+}: {
+  nodes: node[];
+  settings: {};
+}): JSX.Element => {
+  return <div></div>;
+};
+
+type node = {
+  label: string;
+  hover: string;
+};
