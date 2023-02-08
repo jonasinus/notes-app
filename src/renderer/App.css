@@ -1,62 +1,196 @@
-/*
- * @NOTE: Prepend a `~` to css file paths that are in your node_modules
- *        See https://github.com/webpack-contrib/sass-loader#imports
- */
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: #ffffffde;
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+
+  --min-width: 320px;
+  --min-height: 100vh;
+  --title-bar-height: 50px;
+  --main-nav-width: 60px;
+  --main-menu-width: 300px;
+
+  --brand-color: #4e2482;
+  --accent-color: #213547;
+
+  --color: #ffffffde;
+  --background-color: #242424;
+
+  --button-hover-border-color: #646cff;
+  --button-background-color: #1a1a1a;
+
+  --anchor-color: #646cff;
+  --anchor-hover-color: #535bf2;
+}
+
 body {
-  position: relative;
-  color: white;
-  height: 100vh;
-  background: linear-gradient(
-    200.96deg,
-    #fedc2a -29.09%,
-    #dd5789 51.77%,
-    #7a2c9e 129.35%
-  );
-  font-family: sans-serif;
-  overflow-y: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+  min-height: var(--min-height);
+  min-width: var(--min-width);
 }
 
 button {
-  background-color: white;
-  padding: 10px 20px;
-  border-radius: 10px;
-  border: none;
-  appearance: none;
-  font-size: 1.3rem;
-  box-shadow: 0px 8px 28px -6px rgba(24, 39, 75, 0.12),
-    0px 18px 88px -4px rgba(24, 39, 75, 0.14);
-  transition: all ease-in 0.1s;
   cursor: pointer;
-  opacity: 0.9;
+  width: 100%;
+  height: 100%;
 }
 
-button:hover {
-  transform: scale(1.05);
-  opacity: 1;
+#root {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
 }
 
-li {
-  list-style: none;
+#root > div {
+  height: calc(100vh - var(--title-bar-height));
+  display: grid;
+  grid-template-columns: var(--main-nav-width) 0% calc(
+      100% - var(--main-nav-width)
+    );
+  transition: 500ms;
 }
 
-a {
-  text-decoration: none;
-  height: fit-content;
+#root > div:has(nav[data-collapsed='false']) {
+  grid-template-columns:
+    var(--main-nav-width) var(--main-menu-width)
+    calc(100% - calc(var(--main-nav-width) + var(--main-menu-width)));
+}
+
+#root * {
+  /*margin: 0;*/
+  padding: 0;
+  box-sizing: border-box;
+  transition: 500ms;
+}
+
+#titleBar {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: var(--title-bar-height);
+  -webkit-app-region: drag;
+  background-color: var(--brand-color);
+  display: flex;
+}
+
+#titleBar > div {
+  position: fixed;
+  display: grid;
+  grid-template-columns:
+    repeat(4, var(--main-nav-width))
+    calc(100% - calc(4 * var(--main-nav-width)));
+}
+
+#titleBar button {
+  height: var(--title-bar-height);
+  width: 100%;
+  justify-self: center;
+  background-color: #00000020;
+  border: none;
+  -webkit-app-region: no-drag;
+}
+
+#titleBar button:hover {
+  background-color: #00000040;
+}
+
+#titleBar > ul > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-headers {
+  display: flex;
+  gap: 50px;
+  justify-content: space-evenly;
+}
+
+.tab-header {
+  display: flex;
+}
+
+.tab-header .title {
   width: fit-content;
-  margin: 10px;
+  margin: 0;
 }
 
-a:hover {
-  opacity: 1;
-  text-decoration: none;
+#bottom {
+  height: 100%;
+  width: 100%;
 }
 
-.Hello {
+#mainNav {
+  display: flex;
+  width: var(--main-nav-width);
+  background-color: red;
+  height: 100%;
+  z-index: 5;
+}
+
+#mainNav:has(menu.hidden) {
+  width: var(--main-nav-width);
+}
+
+#mainNav * {
+  margin: 0;
+  padding: 0;
+}
+
+#mainNav > ul {
+  list-style: none;
+  width: var(--main-nav-width);
+  height: 100%;
+  border-right: 1px solid var(--background-color);
+
+  display: flex;
+  flex-direction: column;
+}
+
+#mainNav > ul > li {
+  height: var(--main-nav-width);
+  width: 100%;
+}
+
+#mainNav > ul > li:last-of-type {
+  margin-top: auto;
+}
+
+.nav-menu {
+  width: var(--main-menu-width);
+  background-color: #00000060;
+  display: grid;
+  grid-template-rows: var(--main-nav-width) calc(100% - var(--main-nav-width));
+  transition: opacity 0ms;
+  margin: 0;
+}
+
+.nav-menu.hidden {
+  margin-left: calc(-1 * calc(var(--main-menu-width) + var(--main-nav-width)));
+}
+
+.nav-menu > div.actions {
   display: flex;
   justify-content: center;
+  border-bottom: 1px solid var(--background-color);
+}
+
+.nav-menu > div.actions > button {
+  display: flex;
   align-items: center;
-  margin: 20px 0;
+  justify-content: center;
+  height: 100%;
+  width: var(--main-nav-width);
 }

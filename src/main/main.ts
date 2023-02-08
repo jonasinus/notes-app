@@ -71,17 +71,22 @@ const createWindow = async () => {
 
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 728,
+    width: 1700,
+    height: 1000,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
-
+    frame: false,
+    titleBarStyle: 'hidden',
+    titleBarOverlay: {
+      height: 50,
+      color: '#00000000',
+      symbolColor: '#ffffffff',
+    },
     autoHideMenuBar: true,
-    darkTheme: true,
   });
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
