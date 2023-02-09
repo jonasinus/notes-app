@@ -14,6 +14,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import { lstatSync, readdirSync } from 'fs';
 
 class AppUpdater {
   constructor() {
@@ -23,12 +24,31 @@ class AppUpdater {
   }
 }
 
+const VAULT_PATH = 'C://Users/Jonas/Documents/code/notes-app/v4/vault';
+
+function getVaultContents(vault_path: string) {
+  console.log(vault_path);
+  if (!lstatSync(vault_path.toString()).isDirectory)
+    throw new Error('invalid vault directory');
+
+  let contents = readdirSync(vault_path);
+  console.log(contents);
+}
+
+getVaultContents(VAULT_PATH);
+
 let mainWindow: BrowserWindow | null = null;
 
 ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
   event.reply('ipc-example', msgTemplate('pong'));
+});
+
+ipcMain.on('loadVault', async (event, arg) => {
+  let vault = getVaultContents(VAULT_PATH);
+  if (arg.path !== undefined) vault = getVaultContents(arg.path);
+  event.reply('loadVault', vault);
 });
 
 if (process.env.NODE_ENV === 'production') {

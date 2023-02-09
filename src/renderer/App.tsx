@@ -10,10 +10,7 @@ interface tabheader {
 }
 
 function App() {
-  return (
-    <ForceGraph linksData={data.links} nodesData={data.nodes} navOpen={true} />
-  );
-  const [sideBarCollapsed, setSideBarCollapsed] = useState(false);
+  const [sideBarCollapsed, setSideBarCollapsed] = useState(true);
   const [mode, setMode] = useState<'file' | 'graph'>('file');
   const [tabs, setTabs] = useState<tabheader[]>([
     { title: 'hello world', open: true },
@@ -107,7 +104,13 @@ const Tab: React.FC<Props> = ({ initialValue }) => {
   };
 
   function parse(s: string): string {
-    return s.replace(/(\*\*)(.*?)(\*\*)/g, '<strong>$2</strong>');
+    s = s.replace(
+      /^(#+)\s*(.*)$/gm,
+      (match, p1, p2) => `<h${p1.length}>${p2.trim()}</h${p1.length}>`
+    ); // # for heading
+
+    s = s.replace(/(\*\*)(.*?)(\*\*)/g, '<strong>$2</strong>'); // **...** for <strong></strong>
+    return s;
   }
 
   return (
@@ -137,7 +140,9 @@ const Tab: React.FC<Props> = ({ initialValue }) => {
 };
 
 const Graph = (): JSX.Element => {
-  return <div></div>;
+  return (
+    <ForceGraph linksData={data.links} nodesData={data.nodes} navOpen={true} />
+  );
 };
 
 type node = {
