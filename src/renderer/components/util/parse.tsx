@@ -1,3 +1,4 @@
+import { Fragment, createElement } from 'react';
 import { renderToString } from 'react-dom/server';
 
 export function parse(s: string): string {
@@ -16,4 +17,13 @@ export function parse(s: string): string {
   return s;
 }
 
-const JSXToString = (el: JSX.Element) => renderToString(el);
+export const JSXToString = (el: JSX.Element) => renderToString(el);
+
+type JSXElement = React.ReactElement<
+  any,
+  string | React.JSXElementConstructor<any>
+>;
+
+export function stringToTSX(input: string): JSXElement {
+  return createElement(Fragment, null, input);
+}
