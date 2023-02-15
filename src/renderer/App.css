@@ -15,7 +15,7 @@
 
   --min-width: 320px;
   --min-height: 100vh;
-  --title-bar-height: 50px;
+  --title-bar-height: 40px;
   --main-nav-width: 60px;
   --main-menu-width: 300px;
 
@@ -121,14 +121,10 @@ button {
   flex-direction: column;
 }
 
-.tab-headers {
+div.tab-headers {
   display: flex;
   gap: 50px;
   justify-content: space-evenly;
-}
-
-.tab-header {
-  display: flex;
 }
 
 .tab-header .title {
@@ -291,3 +287,15 @@ line.hi {
 }
 
 /*graph styling: end*/
+
+.blurred-text {
+  color: transparent;
+  text-shadow: 0 0 4px #fff;
+  transition: color 200ms, text-shadow 200ms;
+}
+
+.blurred-text:hover,
+.blurred-text:focus {
+  color: initial;
+  text-shadow: none;
+}

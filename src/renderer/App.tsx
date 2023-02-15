@@ -1,21 +1,30 @@
-import { FC, useRef, useState } from 'react';
+import { FC, ReactNode, useEffect, useRef, useState } from 'react';
 import reactLogo from './assets/react.svg';
 import './App.css';
 import { mainModule } from 'process';
 import { ForceGraph } from './components/graph';
+import { renderToString } from 'react-dom/server';
 
 interface tabheader {
   title: string;
   open: boolean;
 }
 
-function App() {
+enum tabTypes {
+  'GRAPH',
+  'FILE',
+}
+
+export function App() {
   const [sideBarCollapsed, setSideBarCollapsed] = useState(true);
   const [mode, setMode] = useState<'file' | 'graph'>('file');
   const [tabs, setTabs] = useState<tabheader[]>([
     { title: 'hello world', open: true },
-    { title: 'second tab', open: false },
   ]);
+  const [menuMode, setMenuMode] = useState<'files' | 'search' | 'liked'>(
+    'files'
+  );
+
   return (
     <>
       <menu id="titleBar">
@@ -26,9 +35,15 @@ function App() {
           >
             {sideBarCollapsed ? 'exp' : 'col'}
           </button>
-          <button type="button">fls</button>
-          <button type="button">srh</button>
-          <button type="button">lke</button>
+          <button type="button" onClick={(e) => setMenuMode('files')}>
+            fls
+          </button>
+          <button type="button" onClick={(e) => setMenuMode('search')}>
+            srh
+          </button>
+          <button type="button" onClick={(e) => setMenuMode('liked')}>
+            lke
+          </button>
           <div className="tab-headers">
             {tabs.map((e, i) => {
               console.log(e);
@@ -87,8 +102,6 @@ function App() {
   );
 }
 
-export default App;
-
 interface Props {
   initialValue: string;
 }
@@ -96,25 +109,66 @@ interface Props {
 const Tab: React.FC<Props> = ({ initialValue }) => {
   const [mode, setMode] = useState<'edit' | 'view'>('edit');
   const [editValue, setEditValue] = useState(initialValue);
-  const [viewValue, setViewValue] = useState('');
+  const [viewValue, setViewValue] = useState(
+    <div>file has no default content</div>
+  );
 
   const handleValueChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     setEditValue(event.target.value);
     setViewValue(parse(event.target.value));
   };
 
-  function parse(s: string): string {
+  function parse(s: string) {
     s = s.replace(
       /^(#+)\s*(.*)$/gm,
       (match, p1, p2) => `<h${p1.length}>${p2.trim()}</h${p1.length}>`
-    ); // # for heading
+    ); // #×x for heading [x]
+    s = s.replace(/(\*\*)(.*?)(\*\*)/g, JSXToString(<strong>$2</strong>)); // **...** for <strong></strong>
+    s = s.replace(/(\*)(.*?)(\*)/g, JSXToString(<i>$2</i>)); // *...* for <italic></italic>
+    s = s.replace(
+      /(\|)(.*?)(\|)/g,
+      JSXToString(<span className="blurred-text">$2</span>)
+    ); // |...| for blurring text between
+    s = s.replace(/(\[\[)(.*?)(\]\])/g, JSXToString(<p>$2</p>)); // [[...]] for creating a  link
 
-    s = s.replace(/(\*\*)(.*?)(\*\*)/g, '<strong>$2</strong>'); // **...** for <strong></strong>
-    return s;
+    let parsed = parseMarkdown(s, '**#*|');
+    console.log(parsed);
+
+    return <div dangerouslySetInnerHTML={{ __html: parsed }}></div>;
+  }
+
+  const JSXToString = (el: JSX.Element) => renderToString(el);
+
+  function parseMarkdown(text: string, markers: string) {
+    const markerRegex = new RegExp(
+      `^((?:\\\\[${markers}]|[^${markers}])+)([${markers}])\\s*(.*)$`,
+      'gm'
+    );
+    return text.replace(markerRegex, (match, p1, p2, p3) => {
+      if (p1.endsWith('\\')) {
+        return match.slice(0, -1) + p2 + ' ' + p3;
+      }
+      switch (p2) {
+        case '**':
+          return `<strong>${p3.trim()}</strong>`;
+        case '*':
+          return `<em>${p3.trim()}</em>`;
+        case '#':
+          return `<h${p2.length}>${p3.trim()}</h${p2.length}>`;
+        case '|':
+          return `<div class="separator">${p3.trim()}</div>`;
+        default:
+          return match;
+      }
+    });
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.ctrlKey && e.key == 'm') setMode(mode == 'view' ? 'edit' : 'view');
   }
 
   return (
-    <div>
+    <div onKeyDown={handleKeyDown}>
       <nav className="tab-nav">
         <button onClick={() => setMode(mode === 'edit' ? 'view' : 'edit')}>
           {mode === 'edit' ? 'View' : 'Edit'}
@@ -128,12 +182,7 @@ const Tab: React.FC<Props> = ({ initialValue }) => {
           className="tab-edit-container"
         />
       ) : (
-        <div
-          dangerouslySetInnerHTML={{
-            __html: viewValue.length === 0 ? 'this file is empty' : viewValue,
-          }}
-          className="tab-view-container"
-        />
+        <div className="tab-view-container">{viewValue}</div>
       )}
     </div>
   );
@@ -151,6 +200,10 @@ type node = {
   linksTo: number;
   id: number;
 };
+
+export function Link({ name }: { name: string }) {
+  return <p>{name}</p>;
+}
 
 export let data = {
   nodes: [
