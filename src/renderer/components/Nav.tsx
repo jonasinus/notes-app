@@ -1,3 +1,8 @@
 export function Nav() {
-  return <></>;
+  return (
+    <>
+      <nav>nav</nav>
+      <menu>menu</menu>
+    </>
+  );
 }

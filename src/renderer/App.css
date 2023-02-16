@@ -16,6 +16,7 @@
   --min-width: 320px;
   --min-height: 100vh;
   --title-bar-height: 40px;
+  --tab-header-width: 7rem;
   --main-nav-width: 60px;
   --main-menu-width: 300px;
 
@@ -41,9 +42,15 @@
   --label-color: #ffffff;
 }
 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
   position: relative;
-  color: black;
+  color: var(--color);
   height: 100vh;
   /*background: linear-gradient(
     200.96deg,
@@ -54,15 +61,44 @@ body {
   font-family: sans-serif;
 }
 
-#titleBar button {
-  height: var(--title-bar-height);
-  width: 100%;
-  justify-self: center;
-  background-color: #00000020;
-  border: none;
-  -webkit-app-region: no-drag;
+#root {
+  display: grid;
+  grid-template-rows: var(--title-bar-height) calc(
+      100vh - var(--title-bar-height)
+    );
 }
 
-#titleBar button:hover {
-  background-color: #00000040;
+.titlebar {
+  display: grid;
+  grid-template-columns:
+    var(--main-nav-width) var(--main-nav-width) var(--main-nav-width)
+    var(--main-nav-width) calc(100vw - calc(4 * var(--main-nav-width)));
+  align-items: center;
+}
+
+.titlebar button {
+  background-color: transparent;
+  border: none;
+}
+
+.titlebar button:hover {
+  background-color: #ffffff20;
+}
+
+.titlebar div.tab-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: var(--tab-header-width);
+  background-color: #ffffff10;
+  padding: 5px 5px 0 5px;
+  border-radius: 5px;
+  margin-top: 5px;
+}
+
+.main-content-container {
+  display: grid;
+  grid-template-columns: var(--main-nav-width) var(--main-menu-width) calc(
+      100vw - var(--main-nav-width) - var(--main-menu-width)
+    );
 }

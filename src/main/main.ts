@@ -24,7 +24,7 @@ class AppUpdater {
   }
 }
 
-const VAULT_PATH = 'C://Users/Jonas/Documents/code/notes-app/v4/vault';
+const VAULT_PATH = 'C://Users/Jonas/Documents/code/notes-app/v10/vault';
 
 function getVaultContents(vault_path: string) {
   console.log(vault_path);
