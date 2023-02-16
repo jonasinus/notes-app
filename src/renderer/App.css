@@ -1,7 +1,46 @@
-/*
- * @NOTE: Prepend a `~` to css file paths that are in your node_modules
- *        See https://github.com/webpack-contrib/sass-loader#imports
- */
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: #ffffffde;
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+
+  --min-width: 320px;
+  --min-height: 100vh;
+  --title-bar-height: 40px;
+  --main-nav-width: 60px;
+  --main-menu-width: 300px;
+
+  --brand-color: #4e2482;
+  --accent-color: #213547;
+
+  --color: #ffffffde;
+  --background-color: #242424;
+
+  --button-hover-border-color: #646cff;
+  --button-background-color: #1a1a1a;
+
+  --anchor-color: #646cff;
+  --anchor-hover-color: #535bf2;
+
+  /*force graph*/
+  --node-color: #5f5f5f;
+  --node-highlight-color: #7f6df2;
+  --node-blendout-color: #8f8f8f;
+  --link-color: #b5b5b5;
+  --link-highlight-color: #6657c8;
+  --link-blendout-color: #3f3f3f;
+  --label-color: #ffffff;
+}
+
 body {
   position: relative;
   color: black;
@@ -15,16 +54,15 @@ body {
   font-family: sans-serif;
 }
 
-button {
-  background-color: white;
-  padding: 10px 20px;
-  border-radius: 10px;
+#titleBar button {
+  height: var(--title-bar-height);
+  width: 100%;
+  justify-self: center;
+  background-color: #00000020;
   border: none;
-  appearance: none;
-  font-size: 1.3rem;
-  box-shadow: 0px 8px 28px -6px rgba(24, 39, 75, 0.12),
-    0px 18px 88px -4px rgba(24, 39, 75, 0.14);
-  transition: all ease-in 0.1s;
-  cursor: pointer;
-  opacity: 0.9;
+  -webkit-app-region: no-drag;
+}
+
+#titleBar button:hover {
+  background-color: #00000040;
 }
