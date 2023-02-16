@@ -74,6 +74,7 @@ body {
     var(--main-nav-width) var(--main-nav-width) var(--main-nav-width)
     var(--main-nav-width) calc(100vw - calc(4 * var(--main-nav-width)));
   align-items: center;
+  -webkit-app-region: drag;
 }
 
 .titlebar button {
@@ -85,15 +86,30 @@ body {
   background-color: #ffffff20;
 }
 
+.titlebar div.tab-headers {
+  -webkit-app-region: drag;
+  display: flex;
+  gap: 5px;
+}
+
 .titlebar div.tab-header {
+  -webkit-app-region: no-drag;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   width: var(--tab-header-width);
   background-color: #ffffff10;
-  padding: 5px 5px 0 5px;
   border-radius: 5px;
+  margin-top: 0px;
+  padding: 5px;
+}
+
+.titlebar div.tab-header.open {
+  padding: 5px 5px 0 5px;
   margin-top: 5px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  font-weight: 700;
 }
 
 .main-content-container {

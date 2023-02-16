@@ -7,10 +7,11 @@ import { TabManager } from './components/TabManager';
 
 export type tab = {
   title: string;
-  position: number;
+  id: number;
   collapsed: boolean;
   filePath: string | null;
   mode: tabMode;
+  open: boolean;
 };
 
 export type tabMode = 'fileview' | 'graphview' | 'daily' | 'calendar';
@@ -18,6 +19,27 @@ export type tabMode = 'fileview' | 'graphview' | 'daily' | 'calendar';
 export function App() {
   const [navExpanded, setNavExpanded] = useState(true);
   const [tabs, setTabs] = useState<tab[]>([]);
+  const [currentTab, setCurrentTab] = useState<tab>({
+    title: 'open a file',
+    collapsed: false,
+    filePath: '',
+    id: 0,
+    mode: 'fileview',
+    open: true,
+  });
+
+  function openTab(id: number) {
+    let t: tab[] = [];
+    tabs.forEach((e) => {
+      e.open = false;
+      if (e.id === id) {
+        e.open = true;
+        setCurrentTab(e);
+      }
+      t.push(e);
+    });
+    setTabs(t);
+  }
 
   useEffect(() => {
     setTabs([
@@ -26,19 +48,85 @@ export function App() {
         collapsed: false,
         filePath: null,
         mode: 'fileview',
-        position: 0,
+        id: 0,
+        open: true,
+      },
+      {
+        title: 'open a file',
+        collapsed: false,
+        filePath: null,
+        mode: 'fileview',
+        id: 1,
+        open: false,
+      },
+      {
+        title: 'open a file',
+        collapsed: false,
+        filePath: null,
+        mode: 'fileview',
+        id: 2,
+        open: false,
       },
     ]);
   }, []);
 
+  useEffect(() => {
+    console.log('open tabs', tabs);
+  }, [tabs]);
+
+  function getUnusedTabId() {
+    let id = 0;
+    let i = tabs.findIndex((e) => e.id === id);
+    while (i > -1) {
+      id = Math.floor(Math.random() * (1 + tabs.length));
+      i = tabs.findIndex((e) => e.id === id);
+    }
+    return id;
+  }
+
+  function addTab(tab?: tab) {
+    if (tab === undefined) {
+      tab = {
+        title: 'open a file',
+        collapsed: false,
+        filePath: '',
+        id: 0,
+        mode: 'fileview',
+        open: true,
+      };
+    }
+    tab.id = getUnusedTabId();
+    setTabs([...tabs, tab]);
+    openTab(tab.id);
+  }
+
+  function removeTab(id: number) {
+    let t: tab[] = [];
+    let rm: tab[] = [];
+    tabs.forEach((e) => {
+      if (e.id !== id) {
+        t.push(e);
+      } else rm.push(e);
+    });
+    setTabs(t);
+    console.log('removed tabs', rm);
+  }
+
   return (
     <>
       <div className="titlebar">
-        <Titlebar tabs={tabs} setTabs={setTabs} />
+        <Titlebar
+          tabs={tabs}
+          setTabs={setTabs}
+          openTab={openTab}
+          addTab={addTab}
+          removeTab={removeTab}
+          currentTab={currentTab}
+        />
       </div>
       <div className="main-content-container">
-        <Nav />
-        <TabManager tabs={tabs} setTabs={setTabs} />
+        <Nav currentTab={currentTab} setCurrentTab={setCurrentTab} />
+        <TabManager tabs={tabs} setTabs={setTabs} currentTab={currentTab} />
       </div>
     </>
   );
