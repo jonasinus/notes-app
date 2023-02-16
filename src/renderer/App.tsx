@@ -1,23 +1,21 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
-
-function Hello() {
-  return <div></div>;
-}
-
-function Main() {
-  return <main>main</main>;
-}
+import { ChangeEvent, useRef, useState, useEffect } from 'react';
+import { Titlebar } from './components/Titlebar';
+import { Nav } from './components/Nav';
+import { TabManager } from './components/TabManager';
 
 export default function App() {
+  const [navExpanded, setNavExpanded] = useState(true);
   return (
-    <Router>
-      <div>
-        <nav></nav>
-        <Routes>
-          <Route path="/" element={<Main />} />
-        </Routes>
+    <>
+      <div className="titlebar-container">
+        <Titlebar />
       </div>
-    </Router>
+      <div className="main-content-container">
+        <Nav />
+        <TabManager />
+      </div>
+    </>
   );
 }
