@@ -24,15 +24,15 @@ class AppUpdater {
   }
 }
 
-const VAULT_PATH = 'C://Users/Jonas/Documents/code/notes-app/v10/vault';
+const VAULT_PATH = 'C:/Users/Jonas/Documents/code/notes-app/v10/default-vault';
 
-function getVaultContents(vault_path: string) {
-  console.log(vault_path);
+function getVaultContents(vault_path: string): string[] {
+  console.log('vault path', vault_path);
   if (!lstatSync(vault_path.toString()).isDirectory)
     throw new Error('invalid vault directory');
 
   let contents = readdirSync(vault_path);
-  console.log(contents);
+  return contents;
 }
 
 getVaultContents(VAULT_PATH);
@@ -45,10 +45,9 @@ ipcMain.on('ipc-example', async (event, arg) => {
   event.reply('ipc-example', msgTemplate('pong'));
 });
 
-ipcMain.on('loadVault', async (event, arg) => {
+ipcMain.on('load-vault', async (event, arg) => {
   let vault = getVaultContents(VAULT_PATH);
-  if (arg.path !== undefined) vault = getVaultContents(arg.path);
-  event.reply('loadVault', vault);
+  event.reply('load-vault', vault);
 });
 
 if (process.env.NODE_ENV === 'production') {

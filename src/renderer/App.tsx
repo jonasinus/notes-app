@@ -27,6 +27,7 @@ export function App() {
     mode: 'fileview',
     open: true,
   });
+  const [fileSearchHidden, setFileSearchHidden] = useState(true);
 
   function openTab(id: number) {
     let t: tab[] = [];
@@ -114,6 +115,13 @@ export function App() {
 
   return (
     <>
+      <div
+        className={['fileSearch', fileSearchHidden ? 'hidden' : ''].join(' ')}
+      >
+        <input type="text" placeholder="find or create a file" />
+        <div className="searchResults"></div>
+        <div className="tooltips"></div>
+      </div>
       <div className="titlebar">
         <Titlebar
           tabs={tabs}
@@ -125,7 +133,12 @@ export function App() {
         />
       </div>
       <div className="main-content-container">
-        <Nav currentTab={currentTab} setCurrentTab={setCurrentTab} />
+        <Nav
+          currentTab={currentTab}
+          setCurrentTab={setCurrentTab}
+          setFileSearchHidden={setFileSearchHidden}
+          fileSearchHidden={fileSearchHidden}
+        />
         <TabManager tabs={tabs} setTabs={setTabs} currentTab={currentTab} />
       </div>
     </>
