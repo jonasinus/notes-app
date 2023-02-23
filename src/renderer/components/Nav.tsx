@@ -4,13 +4,13 @@ import { restartApp, shuffle } from './util/system';
 import AddFolder from '../../icons/addFolder.svg';
 import AddFile from 'icons/addFile.svg';
 import ChangeOrder from 'icons/changeOrder.svg';
-import Graph from 'icons/graph.svg';
-import Draw from 'icons/draw.svg';
-import SearchGlass from 'icons/searchGlass.svg';
-import Calendar from 'icons/calendar.svg';
-import Terminal from 'icons/terminal.svg';
-import QuestionMark from 'icons/questionMark.svg';
-import Settings from 'icons/settings.svg';
+import SearchFileIcon from 'icons/searchFile.svg';
+import GraphIcon from 'icons/graph.svg';
+import DrawIcon from 'icons/draw.svg';
+import CalendarIcon from 'icons/calendar.svg';
+import TerminalIcon from 'icons/terminal.svg';
+import QuestionMarkIcon from 'icons/questionMark.svg';
+import SettingsIcon from 'icons/settings.svg';
 
 export function Nav({
   currentTab,
@@ -24,51 +24,58 @@ export function Nav({
   setCurrentTab: Function;
   fileSearchHidden: boolean;
   setFileSearchHidden: Function;
-  menuState: menuStates;
+  menuState: { before: menuStates; now: menuStates };
   setMenuState: Function;
 }) {
   return (
     <>
-      <nav>
+      <nav className="side-nav main-nav">
         <ul>
           <li>
             <button onClick={(e) => setFileSearchHidden(!fileSearchHidden)}>
-              <SearchGlass />
+              <SearchFileIcon />
             </button>
           </li>
           <li>
             <button>
-              <Graph />
+              <GraphIcon />
             </button>
           </li>
           <li>
             <button>
-              <Draw />
+              <DrawIcon />
             </button>
           </li>
           <li>
             <button>
-              <Calendar />
+              <CalendarIcon />
             </button>
           </li>
           <li>
             <button>
-              <Terminal />
+              <TerminalIcon />
             </button>
           </li>
           <li>
             <button>
-              <QuestionMark />
+              <QuestionMarkIcon />
             </button>
           </li>
           <li>
             <button>
-              <Settings />
+              <SettingsIcon />
             </button>
           </li>
         </ul>
       </nav>
-      <menu className="file-menu">
+      <menu
+        className={[
+          'file-menu',
+          menuState.now === menuStates.COLLAPSED ? 'collapsed' : 'expanded',
+        ].join(' ')}
+        data-state-now={menuStates[menuState.now]}
+        data-state-before={menuStates[menuState.before]}
+      >
         <Menu state={menuState} />
       </menu>
     </>
@@ -84,10 +91,14 @@ export function Nav({
     name: string
   ) {}
 
-  function Menu({ state }: { state: menuStates }) {
-    if (state === menuStates.FILES) {
+  function Menu({ state }: { state: { before: menuStates; now: menuStates } }) {
+    if (
+      state.now === menuStates.FILES ||
+      (menuState.before === menuStates.FILES &&
+        menuState.now === menuStates.COLLAPSED)
+    ) {
       return (
-        <div>
+        <>
           <menu className="top">
             <button type="button" onClick={(e) => {}}>
               <AddFile />
@@ -100,15 +111,15 @@ export function Nav({
             </button>
           </menu>
           <div className="bottom"></div>
-        </div>
+        </>
       );
     }
 
     return (
-      <div>
+      <div className="menu-side error">
         <p>error opening the menu, restart the app</p>
         <button type="button" onClick={(e) => restartApp()}>
-          restart now
+          restart now //does not work rn
         </button>
       </div>
     );

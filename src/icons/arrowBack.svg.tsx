@@ -1,4 +1,4 @@
-export default function ArrowBack() {
+export default function ArrowBackIcon() {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
