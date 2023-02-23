@@ -48,6 +48,11 @@ ipcMain.on('load-vault', async (event, arg) => {
   event.reply('load-vault', vault);
 });
 
+ipcMain.on('restart-all', async (args) => {
+  app.relaunch();
+  app.exit();
+});
+
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
   sourceMapSupport.install();

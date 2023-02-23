@@ -13,7 +13,7 @@ export type tab = {
   open: boolean;
 };
 
-export enum menuState {
+export enum menuStates {
   'FILES',
   'SEARCH',
   'FAVORITES',
@@ -35,6 +35,7 @@ export function App() {
     open: true,
   });
   const [fileSearchHidden, setFileSearchHidden] = useState(true);
+  const [menuState, setMenuState] = useState<menuStates>(menuStates.FILES);
 
   function openTab(id: number) {
     let t: tab[] = [];
@@ -137,6 +138,8 @@ export function App() {
           addTab={addTab}
           removeTab={removeTab}
           currentTab={currentTab}
+          menuState={menuState}
+          setMenuState={setMenuState}
         />
       </div>
       <div className="main-content-container">
@@ -145,6 +148,8 @@ export function App() {
           setCurrentTab={setCurrentTab}
           setFileSearchHidden={setFileSearchHidden}
           fileSearchHidden={fileSearchHidden}
+          menuState={menuState}
+          setMenuState={setMenuState}
         />
         <TabManager tabs={tabs} setTabs={setTabs} currentTab={currentTab} />
       </div>

@@ -1,5 +1,7 @@
-import { tab } from 'renderer/App';
+import { menuStates, tab } from 'renderer/App';
 import { useState } from 'react';
+import ArrowBack from 'icons/arrowBack.svg';
+import ArrowForward from 'icons/arrowForward.svg';
 
 export function Titlebar({
   tabs,
@@ -8,6 +10,8 @@ export function Titlebar({
   addTab,
   removeTab,
   currentTab,
+  menuState,
+  setMenuState,
 }: {
   tabs: tab[];
   setTabs: (t: tab[]) => void;
@@ -15,10 +19,14 @@ export function Titlebar({
   addTab: () => void;
   removeTab: (id: number) => void;
   currentTab: tab;
+  menuState: menuStates;
+  setMenuState: Function;
 }) {
   return (
     <>
-      <button>←</button>
+      <button onClick={(e) => setMenuState(menuStates.COLLAPSED)}>
+        {menuState !== menuStates.COLLAPSED ? <ArrowBack /> : <ArrowForward />}
+      </button>
       <button>f</button>
       <button>s</button>
       <button>l</button>
