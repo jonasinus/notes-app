@@ -1,4 +1,3 @@
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import { ChangeEvent, useRef, useState, useEffect } from 'react';
 import { Titlebar } from './components/Titlebar';
@@ -13,6 +12,14 @@ export type tab = {
   mode: tabMode;
   open: boolean;
 };
+
+export enum menuState {
+  'FILES',
+  'SEARCH',
+  'FAVORITES',
+  'LISTS',
+  'COLLAPSED',
+}
 
 export type tabMode = 'fileview' | 'graphview' | 'daily' | 'calendar';
 
@@ -144,3 +151,9 @@ export function App() {
     </>
   );
 }
+
+window.electron.ipcRenderer.on('load-vault', (arg) => {
+  console.log('vault', arg);
+});
+
+window.electron.ipcRenderer.sendMessage('load-vault', []);

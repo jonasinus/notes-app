@@ -35,8 +35,6 @@ function getVaultContents(vault_path: string): string[] {
   return contents;
 }
 
-getVaultContents(VAULT_PATH);
-
 let mainWindow: BrowserWindow | null = null;
 
 ipcMain.on('ipc-example', async (event, arg) => {

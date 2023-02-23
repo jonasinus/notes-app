@@ -40,7 +40,7 @@ export function Nav({
           </li>
         </ul>
       </nav>
-      <menu>menu</menu>
+      <menu className="file-menu">menu</menu>
     </>
   );
 }
