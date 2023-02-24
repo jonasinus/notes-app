@@ -283,6 +283,15 @@ svg {
   justify-content: space-between;
 }
 
+.widget[data-pos='left'] {
+  --widget-spacing-left: 1rem;
+  --widget-spacing-right: 40rem;
+}
+.widget[data-pos='right'] {
+  --widget-spacing-right: 1rem;
+  --widget-spacing-left: 40rem;
+}
+
 .widget > .widget-titlebar > .move-menu {
   display: flex;
   justify-content: space-between;
@@ -297,4 +306,9 @@ svg {
   padding: 5px;
   border: 1px solid #ffffff60;
   background-color: #00000060;
+  transition: 500ms;
+}
+
+.widget > .widget-titlebar > .move-menu > button[data-highlighted='true'] {
+  display: none;
 }

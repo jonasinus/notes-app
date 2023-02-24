@@ -3,12 +3,7 @@ import { ChangeEvent, useRef, useState, useEffect } from 'react';
 import { Titlebar } from './components/Titlebar';
 import { Nav } from './components/Nav';
 import { TabManager } from './components/TabManager';
-import {
-  HelpWidget,
-  LinkWidget,
-  SearchCreateFileWidget,
-  SettingsWidget,
-} from './components/Widgets';
+import { Widget } from './components/Widgets';
 
 export type tab = {
   title: string;
@@ -184,10 +179,42 @@ export function App() {
         />
         <TabManager tabs={tabs} setTabs={setTabs} currentTab={currentTab} />
         <div className="widgets" data-widget-visible={widget.toString()}>
-          <HelpWidget />
-          <SettingsWidget settings={[]} />
-          <LinkWidget />
-          <SearchCreateFileWidget />
+          <Widget
+            title={'help'}
+            moveable={'left-right'}
+            content={<>hello</>}
+            classname={['widget', 'help']}
+            showTitle={false}
+            visible={widget === 'help'}
+            hide={handleWidget}
+          />
+          <Widget
+            title={'settings'}
+            moveable={'left-right'}
+            content={<>hello</>}
+            classname={['widget', 'settings']}
+            showTitle={false}
+            visible={widget === 'settings'}
+            hide={handleWidget}
+          />
+          <Widget
+            title={'link'}
+            moveable={false}
+            content={<>hello</>}
+            classname={['widget', 'link']}
+            showTitle={false}
+            visible={widget === 'link'}
+            hide={handleWidget}
+          />
+          <Widget
+            title={'search / create'}
+            moveable={'left-right'}
+            content={<>hello</>}
+            classname={['widget', 'search']}
+            showTitle={false}
+            visible={widget === 'search'}
+            hide={handleWidget}
+          />
         </div>
       </div>
     </div>
