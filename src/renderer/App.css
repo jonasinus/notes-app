@@ -16,9 +16,10 @@
   --min-width: 320px;
   --min-height: 100vh;
   --title-bar-height: 40px;
-  --tab-header-width: 7rem;
+  --tab-header-width: 10rem;
   --main-nav-width: 60px;
   --main-menu-width: 300px;
+  --main-menu-transition-time: 500ms;
 
   --widget-spacing-top: 3rem;
   --widget-spacing-bottom: 3rem;
@@ -74,13 +75,13 @@ body {
   font-family: sans-serif;
 
   background: linear-gradient(to bottom, #0d0d0d, #1a1a1a);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cpath fill='%235a4fff' d='M-9,192 C57,129 104,73 122,39 C141,5 177,-25 200,-16 L200,200 L-9,200 Z'/%3E%3Cpath fill='%238f2d56' d='M-2,96 C31,131 72,159 123,193 C174,227 208,218 200,179 L200,200 L-2,200 Z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200' viewBox='0 0 200 200' fill='none'%3E%3Crect width='200' height='200' fill='%231E1E1E'/%3E%3Cg clip-path='url(%23clip0_0_1)'%3E%3Cpath d='M24.5 140.5C72.5 125 100.678 80.5 124.5 43.5C148.322 6.5 175.5 -4.5 200 -13V203H-9L24.5 140.5Z' fill='%235A4FFF'/%3E%3Cg filter='url(%23filter0_d_0_1)'%3E%3Cpath d='M-4 81C60.1595 121.026 70 218 239.029 191.929C338.184 230.812 404.288 220.519 388.734 175.919V199.935H-4V81Z' fill='%238F2D56'/%3E%3C/g%3E%3C/g%3E%3Cdefs%3E%3Cfilter id='filter0_d_0_1' x='-8' y='81' width='403' height='143' filterUnits='userSpaceOnUse' color-interpolation-filters='sRGB'%3E%3CfeFlood flood-opacity='0' result='BackgroundImageFix'/%3E%3CfeColorMatrix in='SourceAlpha' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0' result='hardAlpha'/%3E%3CfeOffset dy='4'/%3E%3CfeGaussianBlur stdDeviation='2'/%3E%3CfeComposite in2='hardAlpha' operator='out'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0'/%3E%3CfeBlend mode='normal' in2='BackgroundImageFix' result='effect1_dropShadow_0_1'/%3E%3CfeBlend mode='normal' in='SourceGraphic' in2='effect1_dropShadow_0_1' result='shape'/%3E%3C/filter%3E%3CclipPath id='clip0_0_1'%3E%3Crect width='200' height='200' fill='white'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E");
   background-size: cover;
   background-position: top left, center bottom;
   background-blend-mode: multiply;
 }
 
-#root {
+#root > #container {
   display: grid;
   grid-template-rows: var(--title-bar-height) calc(
       100vh - var(--title-bar-height)
@@ -111,7 +112,7 @@ body {
   -webkit-app-region: no-drag;
   height: var(--title-bar-height);
   background-color: #ffffff10;
-  border-top-right-radius: var(--titlebar-element-border-radius);
+  border-bottom-right-radius: var(--titlebar-element-border-radius);
 }
 
 .titlebar button {
@@ -127,6 +128,7 @@ body {
   -webkit-app-region: drag;
   display: flex;
   gap: 5px;
+  width: 100%;
 }
 
 .titlebar div.tab-header {
@@ -134,17 +136,21 @@ body {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  width: var(--tab-header-width);
+  max-width: var(--tab-header-width);
+  width: fit-content;
   background-color: #ffffff10;
   border-radius: var(--titlebar-element-border-radius);
   margin-top: 0px;
   padding: var(--titlebar-element-padding);
+  gap: 10px;
 }
 
 .titlebar div.tab-headers > button {
   -webkit-app-region: no-drag;
   padding: var(--titlebar-element-padding);
   margin-top: 5px;
+  font-weight: 700;
+  font-size: 1rem;
 }
 
 .titlebar div.tab-header.open {
@@ -161,7 +167,7 @@ body {
   grid-template-columns: var(--main-nav-width) var(--main-menu-width) calc(
       100vw - var(--main-nav-width) - var(--main-menu-width)
     );
-  transition: all 200ms;
+  transition: all var(--main-menu-transition-time);
   overflow-x: hidden;
 }
 
@@ -183,7 +189,6 @@ body {
   display: flex;
   flex-direction: column;
   height: calc(100vh - var(--title-bar-height) - 20px);
-  gap: 10px;
 }
 
 .main-content-container > nav.side-nav.main-nav > ul > li:nth-child(5) {
@@ -193,16 +198,18 @@ body {
 .main-content-container > nav button {
   background-color: transparent;
   border: none;
-  width: 100%;
+  height: calc(var(--main-nav-width) - 10px);
+  width: calc(var(--main-nav-width) - 10px);
+  margin: 5px;
 }
 
-.main-content-container > nav button:hover,
-.main-content-container > nav button:focus {
+.main-content-container > nav button:hover {
   background-color: #ffffff20;
+  border-radius: 50%;
 }
 
 .main-content-container > menu {
-  transition: all 200ms;
+  transition: all var(--main-menu-transition-time);
   width: 100%;
   box-shadow: 15px 0 15px 0 #00000007;
   padding: 10px 0;
@@ -216,7 +223,24 @@ body {
   display: none;
 }
 
-.fileSearch {
+svg {
+  height: 30px;
+  fill: var(--color);
+}
+
+.titlebar svg {
+  height: 20px;
+}
+
+.widget {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(100vw - var(--widget-spacing-left) - var(--widget-spacing-right));
+  height: calc(
+    100vh - var(--widget-spacing-top) - var(--widget-spacing-bottom)
+  );
+  background-color: #78945650;
   position: absolute;
   top: var(--widget-spacing-top);
   left: var(--widget-spacing-left);
@@ -228,22 +252,49 @@ body {
   );
   width: 100%;
   height: 100%;
-  background-color: #ffffff60;
+  background-color: transparent;
   transition: 200ms ease-in-out;
   border: 1px solid var(--border-subtile-color);
   border-radius: var(--widget-border-radius);
   padding: var(--widget-border-radius);
 }
 
-.fileSearch.hidden {
-  top: calc(-100vh + var(--widget-spacing-top) + var(--widget-spacing-bottom));
+.widgets > * {
+  top: -100vh;
+  left: var(--widget-spacing-left);
+  transition: 500ms;
 }
 
-svg {
-  height: 30px;
-  fill: var(--color);
+.widgets[data-widget-visible='help'] > div.widget.help {
+  top: var(--widget-spacing-top);
+}
+.widgets[data-widget-visible='settings'] > div.widget.settings {
+  top: var(--widget-spacing-top);
+}
+.widgets[data-widget-visible='link'] > div.widget.link {
+  top: var(--widget-spacing-top);
+}
+.widgets[data-widget-visible='search'] > div.widget.search {
+  top: var(--widget-spacing-top);
 }
 
-.titlebar svg {
-  height: 20px;
+.widget > .widget-titlebar {
+  display: flex;
+  justify-content: space-between;
+}
+
+.widget > .widget-titlebar > .move-menu {
+  display: flex;
+  justify-content: space-between;
+  width: 4rem;
+  gap: 2px;
+}
+
+.widget > .widget-titlebar > .move-menu > button {
+  width: 100%;
+  height: 100%;
+  border-radius: 5px;
+  padding: 5px;
+  border: 1px solid #ffffff60;
+  background-color: #00000060;
 }

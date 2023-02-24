@@ -1,4 +1,4 @@
-import { menuStates, tab } from 'renderer/App';
+import { menuStates, tab, widgets } from 'renderer/App';
 import { restartApp, shuffle } from './util/system';
 
 import AddFolder from '../../icons/addFolder.svg';
@@ -19,6 +19,8 @@ export function Nav({
   setFileSearchHidden,
   menuState,
   setMenuState,
+  widget,
+  setWidget,
 }: {
   currentTab: tab;
   setCurrentTab: Function;
@@ -26,13 +28,15 @@ export function Nav({
   setFileSearchHidden: Function;
   menuState: { before: menuStates; now: menuStates };
   setMenuState: Function;
+  widget: widgets;
+  setWidget: Function;
 }) {
   return (
     <>
       <nav className="side-nav main-nav">
         <ul>
           <li>
-            <button onClick={(e) => setFileSearchHidden(!fileSearchHidden)}>
+            <button onClick={(e) => setWidget('search')}>
               <SearchFileIcon />
             </button>
           </li>
@@ -57,12 +61,12 @@ export function Nav({
             </button>
           </li>
           <li>
-            <button>
+            <button onClick={(e) => setWidget('help')}>
               <QuestionMarkIcon />
             </button>
           </li>
           <li>
-            <button>
+            <button onClick={(e) => setWidget('settings')}>
               <SettingsIcon />
             </button>
           </li>

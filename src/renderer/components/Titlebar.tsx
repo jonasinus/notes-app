@@ -27,7 +27,7 @@ export function Titlebar({
   setMenuState: Function;
 }) {
   return (
-    <div className="titlebar">
+    <>
       <div className="buttons">
         <button
           onClick={(e) => {
@@ -90,6 +90,6 @@ export function Titlebar({
           +
         </button>
       </div>
-    </div>
+    </>
   );
 }

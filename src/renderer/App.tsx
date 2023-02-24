@@ -3,6 +3,12 @@ import { ChangeEvent, useRef, useState, useEffect } from 'react';
 import { Titlebar } from './components/Titlebar';
 import { Nav } from './components/Nav';
 import { TabManager } from './components/TabManager';
+import {
+  HelpWidget,
+  LinkWidget,
+  SearchCreateFileWidget,
+  SettingsWidget,
+} from './components/Widgets';
 
 export type tab = {
   title: string;
@@ -20,6 +26,8 @@ export enum menuStates {
   'LISTS',
   'COLLAPSED',
 }
+
+export type widgets = 'help' | 'settings' | 'link' | 'search' | 'null';
 
 export type tabMode = 'fileview' | 'graphview' | 'daily' | 'calendar';
 
@@ -39,6 +47,7 @@ export function App() {
     before: menuStates;
     now: menuStates;
   }>({ before: menuStates.COLLAPSED, now: menuStates.FILES });
+  const [widget, setWidget] = useState<widgets>('null');
 
   useEffect(() => {
     createTab();
@@ -47,8 +56,18 @@ export function App() {
   useEffect(() => {
     const { t, changed } = correctTabActive(tabs, currentTab);
 
-    if (changed) setTabs(t);
-    if (tabs.length <= 0) createTab();
+    if (changed) {
+      setTabs(t);
+      return;
+    }
+    if (tabs.length <= 0) {
+      createTab();
+      return;
+    }
+    let activeTab = tabs.find((e) => e.active === true);
+    if (activeTab === undefined) {
+      setActiveTab(tabs[0].id);
+    }
   }, [tabs]);
 
   function correctTabActive(tabs: tab[], tab: tab) {
@@ -74,7 +93,7 @@ export function App() {
   function createTab(tab?: tab) {
     if (tab === undefined) {
       tab = {
-        title: 'new tab',
+        title: 'new tab [',
         id: 0,
         active: true,
         mode: 'fileview',
@@ -83,7 +102,7 @@ export function App() {
       };
     }
     tab.id = getUnusedTabId();
-    tab.title += tab.id;
+    tab.title = `new tab [${tab.id}]`;
     console.log('created a new tab:', tab.id);
     setTabs([...tabs, tab]);
     setCurrentTab(tab);
@@ -130,25 +149,28 @@ export function App() {
     return id;
   }
 
+  function handleWidget(to: widgets) {
+    if (widget === to) {
+      setWidget('null');
+    } else {
+      setWidget(to);
+    }
+  }
+
   return (
-    <>
-      <div
-        className={['fileSearch', fileSearchHidden ? 'hidden' : ''].join(' ')}
-      >
-        <input type="text" placeholder="find or create a file" />
-        <div className="searchResults"></div>
-        <div className="tooltips"></div>
+    <div id="cotnainer">
+      <div className="titlebar">
+        <Titlebar
+          tabs={tabs}
+          setTabs={setTabs}
+          openTab={setActiveTab}
+          addTab={createTab}
+          removeTab={removeTab}
+          currentTab={currentTab}
+          menuState={menuState}
+          setMenuState={setMenuState}
+        />
       </div>
-      <Titlebar
-        tabs={tabs}
-        setTabs={setTabs}
-        openTab={setActiveTab}
-        addTab={createTab}
-        removeTab={removeTab}
-        currentTab={currentTab}
-        menuState={menuState}
-        setMenuState={setMenuState}
-      />
       <div className="main-content-container">
         <Nav
           currentTab={currentTab}
@@ -157,10 +179,18 @@ export function App() {
           fileSearchHidden={fileSearchHidden}
           menuState={menuState}
           setMenuState={setMenuState}
+          widget={widget}
+          setWidget={handleWidget}
         />
         <TabManager tabs={tabs} setTabs={setTabs} currentTab={currentTab} />
+        <div className="widgets" data-widget-visible={widget.toString()}>
+          <HelpWidget />
+          <SettingsWidget settings={[]} />
+          <LinkWidget />
+          <SearchCreateFileWidget />
+        </div>
       </div>
-    </>
+    </div>
   );
 }
 
