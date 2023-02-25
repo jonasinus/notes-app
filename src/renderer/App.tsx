@@ -4,15 +4,7 @@ import { Titlebar } from './components/Titlebar';
 import { Nav } from './components/Nav';
 import { TabManager } from './components/TabManager';
 import { Widget } from './components/Widgets';
-
-export type tab = {
-  title: string;
-  id: number;
-  collapsed: boolean;
-  filePath: string | null;
-  mode: tabMode;
-  active: boolean;
-};
+import { tab } from './components/Tab';
 
 export enum menuStates {
   'FILES',
@@ -22,9 +14,28 @@ export enum menuStates {
   'COLLAPSED',
 }
 
-export type widgets = 'help' | 'settings' | 'link' | 'search' | 'null';
+export interface Directory {
+  createdAt: Number;
+  editedAt: Number;
+  contents: (File | Directory)[];
+  contentSize: string;
+  contentSizeBytes: number;
+  name: string;
+  isDir: true;
+}
 
-export type tabMode = 'fileview' | 'graphview' | 'daily' | 'calendar';
+export interface File {
+  createdAt: Number;
+  editedAt: Number;
+  contentSizeBytes: number;
+  path: string;
+  basename: string;
+  name: string;
+  contents: [];
+  isDir: false;
+}
+
+export type widgets = 'help' | 'settings' | 'link' | 'search' | 'null';
 
 export function App() {
   const [navExpanded, setNavExpanded] = useState(true);
@@ -36,6 +47,8 @@ export function App() {
     filePath: null,
     mode: 'fileview',
     active: true,
+    parsed: <></>,
+    raw: '',
   });
   const [fileSearchHidden, setFileSearchHidden] = useState(true);
   const [menuState, setMenuState] = useState<{
@@ -44,9 +57,21 @@ export function App() {
   }>({ before: menuStates.COLLAPSED, now: menuStates.FILES });
   const [widget, setWidget] = useState<widgets>('null');
 
+  const [fsData, setFsData] = useState<Directory>();
+
   useEffect(() => {
     createTab();
+    window.electron.ipcRenderer.on('load-vault', (arg) => {
+      console.log('vault', arg);
+      setFsData(arg as Directory);
+    });
+
+    window.electron.ipcRenderer.sendMessage('load-vault', []);
   }, []);
+
+  useEffect(() => {
+    console.log(fsData);
+  }, [fsData]);
 
   useEffect(() => {
     const { t, changed } = correctTabActive(tabs, currentTab);
@@ -94,6 +119,8 @@ export function App() {
         mode: 'fileview',
         collapsed: false,
         filePath: null,
+        raw: '',
+        parsed: <></>,
       };
     }
     tab.id = getUnusedTabId();
@@ -176,6 +203,8 @@ export function App() {
           setMenuState={setMenuState}
           widget={widget}
           setWidget={handleWidget}
+          fsData={fsData}
+          setFsData={setFsData}
         />
         <TabManager tabs={tabs} setTabs={setTabs} currentTab={currentTab} />
         <div className="widgets" data-widget-visible={widget.toString()}>
@@ -220,9 +249,3 @@ export function App() {
     </div>
   );
 }
-
-window.electron.ipcRenderer.on('load-vault', (arg) => {
-  console.log('vault', arg);
-});
-
-window.electron.ipcRenderer.sendMessage('load-vault', []);

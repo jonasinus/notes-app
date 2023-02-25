@@ -1,4 +1,7 @@
-import { tab } from 'renderer/App';
+import { useRef, useEffect } from 'react';
+import { tab } from './Tab';
+import DigitalClock from './DigitalClock';
+import { Tab } from './Tab';
 
 export function TabManager({
   tabs,
@@ -9,5 +12,15 @@ export function TabManager({
   setTabs: Function;
   currentTab: tab;
 }) {
-  return <>tabs</>;
+  return (
+    <div className="tabs">
+      <Tab
+        id={currentTab.id}
+        active
+        mode={currentTab.mode}
+        path={currentTab.filePath}
+        title={currentTab.title}
+      />
+    </div>
+  );
 }

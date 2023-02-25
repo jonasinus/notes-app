@@ -14,7 +14,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-import { lstatSync, readdirSync } from 'fs';
+import { lstat, readdir, stat } from 'fs/promises';
 
 class AppUpdater {
   constructor() {
@@ -26,13 +26,103 @@ class AppUpdater {
 
 const VAULT_PATH = 'C:/Users/Jonas/Documents/code/notes-app/v10/default-vault';
 
-function getVaultContents(vault_path: string): string[] {
-  console.log('vault path', vault_path);
-  if (!lstatSync(vault_path.toString()).isDirectory)
-    throw new Error('invalid vault directory');
+interface Directory {
+  createdAt: Number;
+  editedAt: Number;
+  contents: (File | Directory)[];
+  contentSize: string;
+  contentSizeBytes: number;
+  name: string;
+  isDir: true;
+}
 
-  let contents = readdirSync(vault_path);
-  return contents;
+interface File {
+  createdAt: Number;
+  editedAt: Number;
+  contentSizeBytes: number;
+  path: string;
+  basename: string;
+  name: string;
+  contents: [];
+  isDir: false;
+}
+
+async function getDirectoryContents(dirPath: string): Promise<Directory> {
+  const contents = await readdir(dirPath);
+  const dirStats = await stat(dirPath);
+  const createdAt = Date.parse(dirStats.birthtime.toString());
+  const editedAt = Date.parse(dirStats.mtime.toString());
+  const name = path.basename(dirPath);
+  const isDir = true;
+
+  let contentSizeBytes = 0;
+  const contentsPromises = contents.map(async (content) => {
+    const contentPath = path.join(dirPath, content);
+    const stats = await stat(contentPath);
+
+    if (stats.isDirectory()) {
+      const dir = await getDirectoryContents(contentPath);
+      contentSizeBytes += dir.contentSizeBytes;
+      return dir;
+    }
+
+    const file: File = {
+      createdAt: Date.parse(stats.birthtime.toString()),
+      editedAt: Date.parse(stats.mtime.toString()),
+      contentSizeBytes: stats.size,
+      path: contentPath,
+      basename: path.basename(contentPath),
+      name: content,
+      contents: [],
+      isDir: false,
+    };
+
+    contentSizeBytes += file.contentSizeBytes;
+    return file;
+  });
+
+  const dirContents = await Promise.all(contentsPromises);
+  const contentSize = formatSizeUnits(contentSizeBytes);
+
+  return {
+    createdAt,
+    editedAt,
+    contents: dirContents,
+    contentSize,
+    contentSizeBytes,
+    name,
+    isDir,
+  };
+}
+
+function formatSizeUnits(bytes: number): string {
+  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
+  let index = 0;
+  while (bytes >= 1024 && index < units.length - 1) {
+    bytes /= 1024;
+    index++;
+  }
+  return `${bytes.toFixed(2)} ${units[index]}`;
+}
+
+async function deepScanFileSystem(startPath: string): Promise<any> {
+  const stats = await stat(startPath);
+  if (stats.isDirectory()) {
+    const dir = await getDirectoryContents(startPath);
+    return dir;
+  } else {
+    const file: File = {
+      createdAt: Date.parse(stats.birthtime.toString()),
+      editedAt: Date.parse(stats.mtime.toString()),
+      contentSizeBytes: stats.size,
+      path: startPath,
+      basename: path.basename(startPath),
+      name: path.basename(startPath),
+      contents: [],
+      isDir: false,
+    };
+    return file;
+  }
 }
 
 let mainWindow: BrowserWindow | null = null;
@@ -44,7 +134,7 @@ ipcMain.on('ipc-example', async (event, arg) => {
 });
 
 ipcMain.on('load-vault', async (event, arg) => {
-  let vault = getVaultContents(VAULT_PATH);
+  let vault = await deepScanFileSystem(VAULT_PATH);
   event.reply('load-vault', vault);
 });
 

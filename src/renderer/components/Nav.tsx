@@ -1,4 +1,5 @@
-import { menuStates, tab, widgets } from 'renderer/App';
+import { Directory, File, menuStates, widgets } from 'renderer/App';
+import { tab } from './Tab';
 import { restartApp, shuffle } from './util/system';
 
 import AddFolder from '../../icons/addFolder.svg';
@@ -21,6 +22,8 @@ export function Nav({
   setMenuState,
   widget,
   setWidget,
+  fsData,
+  setFsData,
 }: {
   currentTab: tab;
   setCurrentTab: Function;
@@ -30,6 +33,8 @@ export function Nav({
   setMenuState: Function;
   widget: widgets;
   setWidget: Function;
+  fsData: Directory | undefined;
+  setFsData: Function;
 }) {
   return (
     <>
@@ -80,7 +85,7 @@ export function Nav({
         data-state-now={menuStates[menuState.now]}
         data-state-before={menuStates[menuState.before]}
       >
-        <Menu state={menuState} />
+        <Menu state={menuState} data={fsData} />
       </menu>
     </>
   );
@@ -95,12 +100,51 @@ export function Nav({
     name: string
   ) {}
 
-  function Menu({ state }: { state: { before: menuStates; now: menuStates } }) {
+  function Menu({
+    state,
+    data,
+  }: {
+    state: { before: menuStates; now: menuStates };
+    data: Directory | undefined;
+  }) {
     if (
       state.now === menuStates.FILES ||
       (menuState.before === menuStates.FILES &&
         menuState.now === menuStates.COLLAPSED)
     ) {
+      function mapDir(dir: Directory | File, index: number) {
+        let el = (
+          <>
+            <details className="dir">
+              <summary>
+                {'—'.repeat(index + 1)}
+                {dir.name}
+              </summary>
+              {dir.contents.map((e, i) => {
+                return (
+                  <div style={{ display: 'flex' }}>{mapDir(e, index + 1)}</div>
+                );
+              })}
+            </details>
+          </>
+        );
+        if (!dir.isDir) {
+          el = (
+            <>
+              <div className="file">
+                <h5>
+                  {'—'.repeat(index + 1)}
+                  {dir.name}
+                </h5>
+              </div>
+            </>
+          );
+        }
+        return el;
+      }
+
+      // ├ └ ┬
+
       return (
         <>
           <menu className="top">
@@ -114,7 +158,16 @@ export function Nav({
               <ChangeOrder />
             </button>
           </menu>
-          <div className="bottom"></div>
+          <div className="bottom file-list">
+            {data !== undefined ? (
+              <div>
+                <h4 className="vault-name">{data.name}</h4>
+                <div className="contents">{mapDir(data, 0)}</div>
+              </div>
+            ) : (
+              <></>
+            )}
+          </div>
         </>
       );
     }

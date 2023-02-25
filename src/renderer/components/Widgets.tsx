@@ -6,12 +6,14 @@ export function WidgetTitleBar({
   pos,
   setPos,
   showTitle,
+  hide,
 }: {
   title: string;
   moveable: 'left' | 'right' | 'left-right' | false;
   pos: 'left' | 'middle' | 'right';
   setPos: Function;
   showTitle: boolean;
+  hide: Function;
 }) {
   return (
     <div className="widget-titlebar">
@@ -47,7 +49,7 @@ export function WidgetTitleBar({
             ) : (
               <></>
             )}
-            <button>×</button>
+            <button onClick={(e) => hide('null')}>×</button>
           </>
         )}
       </div>
@@ -82,6 +84,7 @@ export function Widget(props: widgetProps) {
   return (
     <div className={props.classname?.join(' ')} data-pos={pos} ref={el}>
       <WidgetTitleBar
+        hide={props.hide}
         title={props.title}
         moveable={props.moveable}
         pos={pos}
