@@ -24,7 +24,7 @@ class AppUpdater {
   }
 }
 
-const VAULT_PATH = 'C:/Users/Jonas/Documents/code/notes-app/v10/default-vault';
+const VAULT_PATH = 'C:/Users/Jonas/Documents/code/notes-app/v10/default-bunker';
 
 interface Directory {
   createdAt: Number;
@@ -191,8 +191,10 @@ const createWindow = async () => {
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
-    frame: false,
+    frame: true,
     titleBarStyle: 'hidden',
+    transparent: true,
+    //titleBarTransparent: true,
     titleBarOverlay: {
       height: 40,
       color: '#00000000',
