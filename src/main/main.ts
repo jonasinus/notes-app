@@ -191,10 +191,9 @@ const createWindow = async () => {
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
     },
-    frame: true,
+    frame: false,
     titleBarStyle: 'hidden',
-    transparent: true,
-    //titleBarTransparent: true,
+    transparent: false,
     titleBarOverlay: {
       height: 40,
       color: '#00000000',

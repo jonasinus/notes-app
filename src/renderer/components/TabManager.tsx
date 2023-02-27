@@ -1,7 +1,15 @@
 import { useEffect, useState } from 'react';
 import { tab, Tab } from './Tab';
+import { Titlebar } from './Titlebar';
+import { menuStates } from 'renderer/App';
 
-export function TabManager({}: {}) {
+export function TabManager({
+  menuState,
+  setMenuState,
+}: {
+  menuState: { now: menuStates; before: menuStates };
+  setMenuState: Function;
+}) {
   const [tabs, setTabs] = useState<tab[]>([]);
   const [currentTab, setCurrentTab] = useState<tab>({
     title: 'string',
@@ -112,15 +120,57 @@ export function TabManager({}: {}) {
     return id;
   }
 
+  useEffect(() => {
+    createTab();
+  }, []);
+
   return (
-    <div className="tabs">
-      <Tab
-        id={currentTab.id}
-        active
-        mode={currentTab.mode}
-        path={currentTab.filePath}
-        title={currentTab.title}
-      />
+    <div className="tab-manager">
+      <TabBar tabs={tabs} removeTab={removeTab} createTab={createTab} />
+      <button>+</button>
+      <div
+        className={[
+          'tabs',
+          menuState.now === menuStates.COLLAPSED
+            ? 'menu-collapsed'
+            : 'menu-expanded',
+        ].join(' ')}
+        menu-open={(menuState.now !== menuStates.COLLAPSED)
+          .valueOf()
+          .toString()}
+      >
+        <Tab
+          id={currentTab.id}
+          active
+          mode={currentTab.mode}
+          path={currentTab.filePath}
+          title={currentTab.title}
+        />
+      </div>
+    </div>
+  );
+}
+
+function TabBar({
+  tabs,
+  removeTab,
+  createTab,
+}: {
+  tabs: tab[];
+  removeTab: Function;
+  createTab: Function;
+}) {
+  return (
+    <div className="tab-titles">
+      {tabs.map((e) => (
+        <div key={e.id}>
+          <p>{e.title}</p>
+          <button onClick={(ev) => removeTab(e.id)}>×</button>
+        </div>
+      ))}
+      <button className="create-tab" onClick={(e) => createTab()}>
+        +
+      </button>
     </div>
   );
 }

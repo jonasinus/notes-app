@@ -3,7 +3,16 @@ import DigitalClock from './DigitalClock';
 export type tabStates = 'fileview' | 'graph' | 'daily' | 'calendar' | 'canvas';
 
 export function Tab(props: tabProps) {
-  if (props.path === null) return <EmptyTab />;
+  if (props.path === null)
+    return (
+      <EmptyTab
+        active
+        id={props.id}
+        mode={props.mode}
+        path={props.path}
+        title={props.title}
+      />
+    );
   return (
     <>
       <div className="tab">
@@ -33,7 +42,7 @@ export type tab = {
   raw: string;
 };
 
-function EmptyTab() {
+function EmptyTab(props: tabProps) {
   return (
     <div className="tab empty">
       <ul className="options">

@@ -66,6 +66,7 @@ body {
   position: relative;
   color: var(--color);
   height: 100vh;
+  width: 100vw;
   background: linear-gradient(
     200.96deg,
     #c6ac2850 -29.09%,
@@ -81,159 +82,160 @@ body {
   background-blend-mode: multiply;
 }
 
-#root > #container {
-  display: grid;
-  grid-template-rows: var(--title-bar-height) calc(
-      100vh - var(--title-bar-height)
-    );
-}
-
 .titlebar {
-  display: grid;
-  grid-template-columns: calc(5 * var(--main-nav-width)) calc(
-      100vw - calc(5 * var(--main-nav-width)) - 5px
-    );
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: var(--title-bar-height);
+  width: calc(var(--main-nav-width) + var(--main-menu-width));
+  display: flex;
   align-items: center;
-  -webkit-app-region: drag;
-  gap: calc(
-    var(--main-nav-width) + var(--main-menu-width) -
-      calc(5 * var(--main-nav-width))
-  );
-  overflow-x: hidden;
+  z-index: 2;
 }
 
 .titlebar .buttons {
   display: grid;
-  grid-template-columns:
-    var(--main-nav-width) var(--main-nav-width) var(--main-nav-width) var(
-      --main-nav-width
-    )
-    var(--main-nav-width);
-  -webkit-app-region: no-drag;
-  height: var(--title-bar-height);
-  background-color: #ffffff10;
-  border-bottom-right-radius: var(--titlebar-element-border-radius);
+  grid-template-columns: repeat(4, var(--main-nav-width)) calc(
+      100% - calc(4 * var(--main-nav-width))
+    );
 }
 
 .titlebar button {
-  background-color: transparent;
   border: none;
-}
-
-.titlebar button:hover {
-  background-color: #ffffff20;
-}
-
-.titlebar div.tab-headers {
-  -webkit-app-region: drag;
-  display: flex;
-  gap: 5px;
-  width: 100%;
-}
-
-.titlebar div.tab-header {
-  -webkit-app-region: no-drag;
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  max-width: var(--tab-header-width);
-  width: fit-content;
-  background-color: #ffffff10;
-  border-radius: var(--titlebar-element-border-radius);
-  margin-top: 0px;
-  padding: var(--titlebar-element-padding);
-  gap: 10px;
-}
-
-.titlebar div.tab-headers > button {
-  -webkit-app-region: no-drag;
-  padding: var(--titlebar-element-padding);
-  margin-top: 5px;
-  font-weight: 700;
-  font-size: 1rem;
-}
-
-.titlebar div.tab-header.open {
-  padding: var(--titlebar-element-padding) var(--titlebar-element-padding) 0
-    var(--titlebar-element-padding);
-  margin-top: 5px;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-  font-weight: 700;
-}
-
-.main-content-container {
-  display: grid;
-  grid-template-columns: var(--main-nav-width) var(--main-menu-width) calc(
-      100vw - var(--main-nav-width) - var(--main-menu-width)
-    );
-  transition: all var(--main-menu-transition-time);
-  overflow-x: hidden;
-}
-
-.main-content-container:not(:has(menu.file-menu.expanded)) {
-  display: grid;
-  grid-template-columns: var(--main-nav-width) 0% calc(
-      100vw - var(--main-nav-width)
-    );
-}
-
-.main-content-container > nav {
   background-color: transparent;
-  box-shadow: 0 0 15px 0 #00000020;
-  z-index: 5;
-  padding: 10px 0;
-}
-
-.main-content-container > nav.side-nav.main-nav > ul {
-  display: flex;
-  flex-direction: column;
-  height: calc(100vh - var(--title-bar-height) - 20px);
-}
-
-.main-content-container > nav.side-nav.main-nav > ul > li:nth-child(5) {
-  flex-grow: 1;
-}
-
-.main-content-container > nav button {
-  background-color: transparent;
-  border: none;
-  height: calc(var(--main-nav-width) - 10px);
-  width: calc(var(--main-nav-width) - 10px);
-  margin: 5px;
-}
-
-.main-content-container > nav button:hover {
-  background-color: #ffffff20;
-  border-radius: 50%;
-}
-
-.main-content-container > menu {
-  transition: var(--main-menu-transition-time);
-  width: 100%;
-  box-shadow: 15px 0 15px 0 #00000007;
-  padding: 10px 0;
-  background-color: #ffffff20;
-}
-
-.main-content-container > menu.collapsed {
-  width: 0px;
-}
-
-.main-content-container > menu.collapsed * {
-  opacity: 0;
-  pointer-events: none;
-}
-
-svg {
-  height: 30px;
   fill: var(--color);
 }
 
 .titlebar svg {
-  height: 20px;
+  height: 22px;
 }
 
+.main-menu {
+  position: fixed;
+  top: var(--title-bar-height);
+  left: var(--main-nav-width);
+  height: 100%;
+  padding: 10px 0;
+  transition: all 200ms;
+  z-index: 2;
+}
+
+.main-menu.collapsed {
+  width: 0px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.main-nav {
+  position: fixed;
+  top: var(--title-bar-height);
+  left: 0;
+  display: flex;
+  justify-content: center;
+  width: var(--main-nav-width);
+  height: calc(100vh - var(--title-bar-height));
+  padding: 10px 0;
+  z-index: 2;
+}
+
+.main-nav ul {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+}
+
+.main-nav ul > li:nth-last-child(3) {
+  flex-grow: 1;
+}
+
+button {
+  background-color: transparent;
+  fill: var(--color);
+  border: none;
+}
+
+.tab-manager {
+  position: fixed;
+  top: 0;
+  left: var(--main-nav-width);
+  width: calc(100vw - var(--main-nav-width));
+  height: 100vh;
+}
+
+.tab-manager .tab-titles {
+  position: fixed;
+  left: calc(var(--main-nav-width) + var(--main-menu-width));
+  top: 0;
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+  height: var(--title-bar-height);
+  width: calc(100vw - var(--main-nav-width) - var(--main-menu-width));
+  -webkit-app-region: drag;
+  z-index: 2;
+}
+
+.tab-manager > .tab-titles > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 5px 5px 0;
+  gap: 5px;
+  -webkit-app-region: no-drag;
+}
+
+.tab-manager > .tab-titles button {
+  cursor: pointer;
+}
+
+button.create-tab {
+  -webkit-app-region: no-drag;
+}
+
+.tab-manager > .tabs {
+  position: fixed;
+  top: var(--title-bar-height);
+  left: var(--main-nav-width);
+  transition: left 200ms;
+}
+
+.tab-manager > .tabs.menu-expanded {
+  left: calc(var(--main-nav-width) + var(--main-menu-width));
+}
+
+.tab-manager > .tabs > .tab {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: calc(100vw - var(--main-nav-width));
+  height: calc(100vh - var(--title-bar-height));
+  transition: width 200ms;
+}
+
+.tab-manager > .tabs.menu-expanded > .tab {
+  width: calc(100vw - var(--main-nav-width) - var(--main-menu-width));
+}
+
+svg {
+  height: 30px;
+  width: 100%;
+  fill: var(--color);
+}
+
+/*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*
+*/
 .widget {
   position: absolute;
   top: 0;
@@ -330,30 +332,6 @@ details.dir > summary::before {
 
 details.dir[open] > summary::before {
   transform: rotate(90deg);
-}
-
-.tabs {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.tab:not(.empty) {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 10rem;
-  font-family: 'Courier New', Courier, monospace;
-  font-weight: 900;
-  pointer-events: none;
-}
-
-.tab.empty {
-  display: flex;
-}
-
-.tab.empty > ul.options {
-  list-style: none;
 }
 
 .focused {

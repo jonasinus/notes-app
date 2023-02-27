@@ -5,6 +5,10 @@ import { Nav } from './components/Nav';
 import { TabManager } from './components/TabManager';
 import { Widget } from './components/Widgets';
 import { tab } from './components/Tab';
+import AddFileIcon from '../icons/addFile.svg';
+import AddFolderIcon from '../icons/addFolder.svg';
+import ChangeOrder from '../icons/changeOrder.svg';
+import { Menu } from './components/Menu';
 
 export enum menuStates {
   'FILES',
@@ -49,16 +53,6 @@ export function App() {
   const [fsData, setFsData] = useState<Directory>();
 
   useEffect(() => {
-    createTab();
-    window.electron.ipcRenderer.on('load-vault', (arg) => {
-      console.log('vault', arg);
-      setFsData(arg as Directory);
-    });
-
-    window.electron.ipcRenderer.sendMessage('load-vault', []);
-  }, []);
-
-  useEffect(() => {
     console.log(fsData);
   }, [fsData]);
 
@@ -70,73 +64,70 @@ export function App() {
     }
   }
 
+  useEffect(() => {
+    window.electron.ipcRenderer.on('load-vault', (arg) => {
+      console.log('vault', arg);
+      setFsData(arg as Directory);
+    });
+
+    window.electron.ipcRenderer.sendMessage('load-vault', []);
+  }, []);
+
   return (
     <div id="cotnainer">
-      <div className="titlebar">
-        <Titlebar
-          tabs={tabs}
-          setTabs={setTabs}
-          openTab={setActiveTab}
-          addTab={createTab}
-          removeTab={removeTab}
-          currentTab={currentTab}
-          menuState={menuState}
-          setMenuState={setMenuState}
+      <Titlebar menuState={menuState} setMenuState={setMenuState} />
+      <Nav
+        setFileSearchHidden={setFileSearchHidden}
+        fileSearchHidden={fileSearchHidden}
+        menuState={menuState}
+        setMenuState={setMenuState}
+        widget={widget}
+        setWidget={handleWidget}
+        fsData={fsData}
+        setFsData={setFsData}
+      />
+      <Menu state={menuState} data={fsData} />
+      <TabManager menuState={menuState} setMenuState={setMenuState} />
+      <div className="widgets" data-widget-visible={widget.toString()}>
+        <Widget
+          title={'help'}
+          moveable={'left-right'}
+          content={<>hello</>}
+          classname={['widget', 'help']}
+          showTitle={false}
+          visible={widget === 'help'}
+          hide={handleWidget}
         />
-      </div>
-      <div className="main-content-container">
-        <Nav
-          currentTab={currentTab}
-          setCurrentTab={setCurrentTab}
-          setFileSearchHidden={setFileSearchHidden}
-          fileSearchHidden={fileSearchHidden}
-          menuState={menuState}
-          setMenuState={setMenuState}
-          widget={widget}
-          setWidget={handleWidget}
-          fsData={fsData}
-          setFsData={setFsData}
+        <Widget
+          title={'settings'}
+          moveable={'left-right'}
+          content={<>hello</>}
+          classname={['widget', 'settings']}
+          showTitle={false}
+          visible={widget === 'settings'}
+          hide={handleWidget}
         />
-        <TabManager tabs={tabs} setTabs={setTabs} currentTab={currentTab} />
-        <div className="widgets" data-widget-visible={widget.toString()}>
-          <Widget
-            title={'help'}
-            moveable={'left-right'}
-            content={<>hello</>}
-            classname={['widget', 'help']}
-            showTitle={false}
-            visible={widget === 'help'}
-            hide={handleWidget}
-          />
-          <Widget
-            title={'settings'}
-            moveable={'left-right'}
-            content={<>hello</>}
-            classname={['widget', 'settings']}
-            showTitle={false}
-            visible={widget === 'settings'}
-            hide={handleWidget}
-          />
-          <Widget
-            title={'link'}
-            moveable={false}
-            content={<>hello</>}
-            classname={['widget', 'link']}
-            showTitle={false}
-            visible={widget === 'link'}
-            hide={handleWidget}
-          />
-          <Widget
-            title={'search / create'}
-            moveable={'left-right'}
-            content={<>hello</>}
-            classname={['widget', 'search']}
-            showTitle={false}
-            visible={widget === 'search'}
-            hide={handleWidget}
-          />
-        </div>
+        <Widget
+          title={'link'}
+          moveable={false}
+          content={<>hello</>}
+          classname={['widget', 'link']}
+          showTitle={false}
+          visible={widget === 'link'}
+          hide={handleWidget}
+        />
+        <Widget
+          title={'search / create'}
+          moveable={'left-right'}
+          content={<>hello</>}
+          classname={['widget', 'search']}
+          showTitle={false}
+          visible={widget === 'search'}
+          hide={handleWidget}
+        />
       </div>
     </div>
   );
 }
+
+function restartApp() {}
