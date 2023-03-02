@@ -67,7 +67,7 @@ export function TabManager({
         active: true,
         mode: 'fileview',
         collapsed: false,
-        filePath: null,
+        filePath: '',
         raw: '',
         parsed: <></>,
       };
@@ -126,7 +126,12 @@ export function TabManager({
 
   return (
     <div className="tab-manager">
-      <TabBar tabs={tabs} removeTab={removeTab} createTab={createTab} />
+      <TabBar
+        tabs={tabs}
+        removeTab={removeTab}
+        createTab={createTab}
+        activate={setActiveTab}
+      />
       <button>+</button>
       <div
         className={[
@@ -155,15 +160,17 @@ function TabBar({
   tabs,
   removeTab,
   createTab,
+  activate,
 }: {
   tabs: tab[];
   removeTab: Function;
   createTab: Function;
+  activate: Function;
 }) {
   return (
     <div className="tab-titles">
       {tabs.map((e) => (
-        <div key={e.id}>
+        <div key={e.id} onClick={(ev) => activate(e.id)}>
           <p>{e.title}</p>
           <button onClick={(ev) => removeTab(e.id)}>×</button>
         </div>
