@@ -7,6 +7,7 @@ export function WidgetTitleBar({
   setPos,
   showTitle,
   hide,
+  ref,
 }: {
   title: string;
   moveable: 'left' | 'right' | 'left-right' | false;
@@ -14,9 +15,10 @@ export function WidgetTitleBar({
   setPos: Function;
   showTitle: boolean;
   hide: Function;
+  ref: any;
 }) {
   return (
-    <div className="widget-titlebar">
+    <div className="widget-titlebar" ref={ref}>
       {showTitle ? <h4>{title}</h4> : <h4></h4>}
       <div className="move-menu">
         {!moveable ? (
@@ -69,20 +71,30 @@ interface widgetProps {
 
 export function Widget(props: widgetProps) {
   const [pos, setPos] = useState<'left' | 'right' | 'middle'>('middle');
-  const el = useRef(null);
+
+  const widgetRef = useRef<HTMLDivElement>(null);
+  const widgetBarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (props.visible) {
-      const listener = (e: MouseEvent) => {
-        console.log('clicked on widget: ', el.current === e.target);
-      };
-      document.addEventListener('click', listener);
-      return () => document.removeEventListener('click', listener);
+      let i = 0;
+      function handleClick(event: MouseEvent) {
+        if (
+          widgetRef.current?.contains(event.target as Node) &&
+          !widgetBarRef.current?.contains(event.target as Node)
+        ) {
+        } else {
+          if (i > 0) props.hide('null');
+          else i++;
+        }
+      }
+      document.addEventListener('click', handleClick);
+      return () => document.removeEventListener('click', handleClick);
     }
   }, [props.visible]);
 
   return (
-    <div className={props.classname?.join(' ')} data-pos={pos} ref={el}>
+    <div className={props.classname?.join(' ')} data-pos={pos} ref={widgetRef}>
       <WidgetTitleBar
         hide={props.hide}
         title={props.title}
@@ -90,8 +102,86 @@ export function Widget(props: widgetProps) {
         pos={pos}
         setPos={setPos}
         showTitle={props.showTitle}
+        ref={widgetBarRef}
       />
       <div>{props.content}</div>
+    </div>
+  );
+}
+
+export function SettingsWidgetContent() {
+  return (
+    <div>
+      <div>
+        <h3>Privacy</h3>
+        <ul>
+          <li>
+            <h4>serverless</h4>
+            <input type="checkbox" defaultChecked />
+          </li>
+          <li>
+            <h4>encrypt local bunker</h4>
+            <input type="checkbox" defaultChecked />
+          </li>
+          <li>
+            <h4>set encryption key</h4>
+            <input type="password" defaultValue="****" />
+          </li>
+          <li>
+            <h4>connect to vibeo-sync™</h4>
+            <button type="button">connect through browser</button>
+          </li>
+          <li>
+            <h4>use a custom server</h4>
+            <input type="text" placeholder="url to configured server" />
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h3>Font</h3>
+        <ul>
+          <li>
+            <h4>custom-font</h4>
+            <input type="text" defaultValue="none" />
+          </li>
+          <li>
+            <h4>font-scaling (%)</h4>
+            <input type="range" min="1" max="200" defaultValue="100" />
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h3>Theme</h3>
+        <ul>
+          <li>
+            <h4>mode</h4>
+            <select>
+              <option value="light">light</option>
+              <option value="dark">dark</option>
+              <option value="system">system preffered</option>
+            </select>
+          </li>
+        </ul>
+      </div>
+      <div>
+        <h3>Developer</h3>
+        <ul>
+          <li>
+            <h4>use code-highlighting</h4>
+            <input type="checkbox" defaultChecked />
+          </li>
+          <li>
+            <h4>use internal terminal</h4>
+            <input type="checkbox" />
+          </li>
+        </ul>
+      </div>
+      <div className="manageChanges">
+        <button>Undo</button>
+        <button>Redo</button>
+        <button>Apply</button>
+        <button>Reset</button>
+      </div>
     </div>
   );
 }

@@ -21,10 +21,10 @@
   --main-menu-width: 300px;
   --main-menu-transition-time: 500ms;
 
-  --widget-spacing-top: 3rem;
-  --widget-spacing-bottom: 3rem;
-  --widget-spacing-left: 20rem;
-  --widget-spacing-right: 20rem;
+  --widget-spacing-top: 5vh;
+  --widget-spacing-bottom: 5vh;
+  --widget-spacing-left: 15vw;
+  --widget-spacing-right: 15vw;
 
   --brand-color: #4e2482;
   --accent-color: #213547;
@@ -267,7 +267,6 @@ svg {
   height: calc(
     100vh - var(--widget-spacing-top) - var(--widget-spacing-bottom)
   );
-  background-color: #78945650;
   position: absolute;
   top: var(--widget-spacing-top);
   left: var(--widget-spacing-left);
@@ -278,12 +277,13 @@ svg {
     100vh - var(--widget-spacing-top) - var(--widget-spacing-bottom)
   );
   width: 100%;
-  height: 100%;
+  height: 20vh;
   background-color: transparent;
   transition: 200ms ease-in-out;
   border: 1px solid var(--border-subtile-color);
   border-radius: var(--widget-border-radius);
   padding: var(--widget-border-radius);
+  background-color: #000000d1;
 }
 
 .widgets > * {

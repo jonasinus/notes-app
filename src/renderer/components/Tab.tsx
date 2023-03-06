@@ -14,6 +14,7 @@ export interface tabProps {
   title: string;
   menuState: { now: menuStates; before: menuStates };
   setMenuState: Function;
+  widgetHandler: Function;
 }
 
 export type tab = {
@@ -53,6 +54,7 @@ export function Tab(props: tabProps) {
         title={props.title}
         menuState={props.menuState}
         setMenuState={props.setMenuState}
+        widgetHandler={props.widgetHandler}
       />
     );
 
@@ -110,11 +112,17 @@ function EmptyTab(props: tabProps) {
   return (
     <div className="tab empty">
       <ul className="options">
-        <li className="option">create a file</li>
+        <li
+          className="option"
+          onClick={(e) => {
+            props.widgetHandler('search');
+          }}
+        >
+          create a file
+        </li>
         <li className="option">open a file</li>
         <li className="option">search recent files</li>
       </ul>
-      <p>[{props.id}]</p>
     </div>
   );
 }

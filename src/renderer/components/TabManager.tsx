@@ -6,9 +6,11 @@ import { menuStates } from 'renderer/App';
 export function TabManager({
   menuState,
   setMenuState,
+  widgetHandler,
 }: {
   menuState: { now: menuStates; before: menuStates };
   setMenuState: Function;
+  widgetHandler: Function;
 }) {
   const [tabs, setTabs] = useState<tab[]>([]);
   const [tabElements, setTabElements] = useState<JSX.Element[]>([]);
@@ -68,7 +70,7 @@ export function TabManager({
         active: true,
         mode: 'fileview',
         collapsed: false,
-        filePath: '',
+        filePath: null,
         raw: '',
         parsed: <></>,
       };
@@ -161,6 +163,7 @@ export function TabManager({
                 before: menuStates.COLLAPSED,
               }}
               setMenuState={setMenuState}
+              widgetHandler={widgetHandler}
             />
           );
         })}

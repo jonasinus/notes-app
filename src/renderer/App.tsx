@@ -3,7 +3,7 @@ import { ChangeEvent, useRef, useState, useEffect } from 'react';
 import { Titlebar } from './components/Titlebar';
 import { Nav } from './components/Nav';
 import { TabManager } from './components/TabManager';
-import { Widget } from './components/Widgets';
+import { SettingsWidgetContent, Widget } from './components/Widgets';
 import { tab } from './components/Tab';
 import AddFileIcon from '../icons/addFile.svg';
 import AddFolderIcon from '../icons/addFolder.svg';
@@ -69,7 +69,11 @@ export function App() {
         widget={widget}
         setWidget={handleWidget}
       />
-      <TabManager menuState={menuState} setMenuState={setMenuState} />
+      <TabManager
+        menuState={menuState}
+        setMenuState={setMenuState}
+        widgetHandler={handleWidget}
+      />
       <div className="widgets" data-widget-visible={widget.toString()}>
         <Widget
           title={'help'}
@@ -83,7 +87,7 @@ export function App() {
         <Widget
           title={'settings'}
           moveable={'left-right'}
-          content={<>hello</>}
+          content={<SettingsWidgetContent />}
           classname={['widget', 'settings']}
           showTitle={false}
           visible={widget === 'settings'}
@@ -111,5 +115,3 @@ export function App() {
     </div>
   );
 }
-
-function restartApp() {}
