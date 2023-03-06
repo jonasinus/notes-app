@@ -65,7 +65,7 @@ export function Menu({
             </div>
           ) : (
             <>
-              there was an error accessing your vault. make sure the path you
+              there was an error accessing your bunker. make sure the path you
               specified is correct and the programm has enough permissions to
               access it
             </>

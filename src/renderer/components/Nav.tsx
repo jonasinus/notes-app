@@ -10,6 +10,7 @@ import TerminalIcon from 'icons/terminal.svg';
 import QuestionMarkIcon from 'icons/questionMark.svg';
 import SettingsIcon from 'icons/settings.svg';
 import { useState } from 'react';
+import { Menu } from './Menu';
 
 export function Nav({
   fileSearchHidden,
@@ -18,6 +19,7 @@ export function Nav({
   setMenuState,
   widget,
   setWidget,
+  bunker,
 }: {
   fileSearchHidden: boolean;
   setFileSearchHidden: Function;
@@ -25,6 +27,7 @@ export function Nav({
   setMenuState: Function;
   widget: widgets;
   setWidget: Function;
+  bunker: Directory | undefined;
 }) {
   const [focus, setFocus] = useState<string | null>(null);
 
@@ -69,6 +72,13 @@ export function Nav({
           </li>
         </ul>
       </nav>
+      <Menu
+        state={{
+          before: menuState.before,
+          now: menuState.now,
+        }}
+        data={bunker}
+      />
     </>
   );
 

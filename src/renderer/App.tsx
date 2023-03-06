@@ -1,14 +1,9 @@
 import './App.css';
-import { ChangeEvent, useRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Titlebar } from './components/Titlebar';
 import { Nav } from './components/Nav';
 import { TabManager } from './components/TabManager';
 import { SettingsWidgetContent, Widget } from './components/Widgets';
-import { tab } from './components/Tab';
-import AddFileIcon from '../icons/addFile.svg';
-import AddFolderIcon from '../icons/addFolder.svg';
-import ChangeOrder from '../icons/changeOrder.svg';
-import { Menu } from './components/Menu';
 
 export enum menuStates {
   'FILES',
@@ -49,6 +44,7 @@ export function App() {
     now: menuStates;
   }>({ before: menuStates.COLLAPSED, now: menuStates.FILES });
   const [widget, setWidget] = useState<widgets>('null');
+  const [bunker, setBunker] = useState<Directory | undefined>(undefined);
 
   function handleWidget(to: widgets) {
     if (widget === to) {
@@ -57,6 +53,20 @@ export function App() {
       setWidget(to);
     }
   }
+
+  function enterBunker() {
+    window.electron.ipcRenderer.on('load-vault', (arg) => {
+      console.log('bunker', arg as Directory);
+      setBunker(arg as Directory);
+    });
+    window.electron.ipcRenderer.sendMessage('load-vault', []);
+  }
+
+  function exitBunker() {}
+
+  useEffect(() => {
+    enterBunker();
+  }, []);
 
   return (
     <div id="cotnainer">
@@ -68,6 +78,7 @@ export function App() {
         setMenuState={setMenuState}
         widget={widget}
         setWidget={handleWidget}
+        bunker={bunker}
       />
       <TabManager
         menuState={menuState}
