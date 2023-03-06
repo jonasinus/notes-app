@@ -104,10 +104,17 @@ body {
   border: none;
   background-color: transparent;
   fill: var(--color);
+  width: 100%;
+  min-height: var(--title-bar-height);
+}
+
+.titlebar button:hover {
+  background-color: #ffffff20;
 }
 
 .titlebar svg {
   height: 22px;
+  font-size: 0px;
 }
 
 .main-menu {
@@ -182,6 +189,18 @@ button {
   padding: 5px 5px 5px 0;
   gap: 5px;
   -webkit-app-region: no-drag;
+  border-radius: 5px;
+}
+
+.tab-manager > .tab-titles > div[data-active='true'] {
+  font-weight: 700;
+  padding: 5px 5px 0 0;
+  margin-top: 5px;
+  background-color: #ffffff20;
+}
+
+.tab-manager > .tab-titles > div > p {
+  cursor: pointer;
 }
 
 .tab-manager > .tab-titles button {
@@ -210,6 +229,10 @@ button.create-tab {
   width: calc(100vw - var(--main-nav-width));
   height: calc(100vh - var(--title-bar-height));
   transition: width 200ms;
+}
+
+.tab-manager > .tabs > .tab[data-active='false'] {
+  display: none;
 }
 
 .tab-manager > .tabs.menu-expanded > .tab {
@@ -348,8 +371,10 @@ details.dir[open] > summary::before {
   display: flex;
 }
 
-.file,
-.dir:not(summary) {
+.file {
+  padding-left: 2rem;
+}
+.dir {
   padding-left: 1rem;
 }
 

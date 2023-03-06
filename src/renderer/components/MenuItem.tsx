@@ -53,7 +53,11 @@ export function MenuItem({
 
   if (e.isDir)
     return (
-      <details className="dir" open={open}>
+      <details
+        className="dir"
+        open={open}
+        key={e.name + e.contentSizeBytes + e.contents.length}
+      >
         <summary>
           <div className="indicators">
             <FolderIcon open={false} />
@@ -76,7 +80,7 @@ export function MenuItem({
     );
 
   return (
-    <div className="file">
+    <div className="file" key={e.name + e.contentSizeBytes + e.contents.length}>
       <div className="indicators">
         {/*getIndicators(e, n, totalItems, position)*/}
         <AddFileIcon />

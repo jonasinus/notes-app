@@ -18,8 +18,6 @@ export function Nav({
   setMenuState,
   widget,
   setWidget,
-  fsData,
-  setFsData,
 }: {
   fileSearchHidden: boolean;
   setFileSearchHidden: Function;
@@ -27,8 +25,6 @@ export function Nav({
   setMenuState: Function;
   widget: widgets;
   setWidget: Function;
-  fsData: Directory | undefined;
-  setFsData: Function;
 }) {
   const [focus, setFocus] = useState<string | null>(null);
 

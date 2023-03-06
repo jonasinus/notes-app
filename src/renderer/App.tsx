@@ -50,12 +50,6 @@ export function App() {
   }>({ before: menuStates.COLLAPSED, now: menuStates.FILES });
   const [widget, setWidget] = useState<widgets>('null');
 
-  const [fsData, setFsData] = useState<Directory>();
-
-  useEffect(() => {
-    console.log(fsData);
-  }, [fsData]);
-
   function handleWidget(to: widgets) {
     if (widget === to) {
       setWidget('null');
@@ -63,15 +57,6 @@ export function App() {
       setWidget(to);
     }
   }
-
-  useEffect(() => {
-    window.electron.ipcRenderer.on('load-vault', (arg) => {
-      console.log('vault', arg);
-      setFsData(arg as Directory);
-    });
-
-    window.electron.ipcRenderer.sendMessage('load-vault', []);
-  }, []);
 
   return (
     <div id="cotnainer">
@@ -83,10 +68,7 @@ export function App() {
         setMenuState={setMenuState}
         widget={widget}
         setWidget={handleWidget}
-        fsData={fsData}
-        setFsData={setFsData}
       />
-      <Menu state={menuState} data={fsData} />
       <TabManager menuState={menuState} setMenuState={setMenuState} />
       <div className="widgets" data-widget-visible={widget.toString()}>
         <Widget

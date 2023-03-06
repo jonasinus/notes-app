@@ -11,6 +11,7 @@ export function TabManager({
   setMenuState: Function;
 }) {
   const [tabs, setTabs] = useState<tab[]>([]);
+  const [tabElements, setTabElements] = useState<JSX.Element[]>([]);
   const [currentTab, setCurrentTab] = useState<tab>({
     title: 'string',
     id: 0,
@@ -124,6 +125,10 @@ export function TabManager({
     createTab();
   }, []);
 
+  useEffect(() => {
+    console.log(currentTab);
+  }, [currentTab]);
+
   return (
     <div className="tab-manager">
       <TabBar
@@ -132,7 +137,6 @@ export function TabManager({
         createTab={createTab}
         activate={setActiveTab}
       />
-      <button>+</button>
       <div
         className={[
           'tabs',
@@ -144,13 +148,22 @@ export function TabManager({
           .valueOf()
           .toString()}
       >
-        <Tab
-          id={currentTab.id}
-          active
-          mode={currentTab.mode}
-          path={currentTab.filePath}
-          title={currentTab.title}
-        />
+        {tabs.map((e, i) => {
+          return (
+            <Tab
+              id={e.id}
+              path={e.filePath}
+              active={e.active}
+              mode={e.mode}
+              title={e.title}
+              menuState={{
+                now: menuStates.FILES,
+                before: menuStates.COLLAPSED,
+              }}
+              setMenuState={setMenuState}
+            />
+          );
+        })}
       </div>
     </div>
   );
@@ -170,8 +183,14 @@ function TabBar({
   return (
     <div className="tab-titles">
       {tabs.map((e) => (
-        <div key={e.id} onClick={(ev) => activate(e.id)}>
-          <p>{e.title}</p>
+        <div key={e.id} data-active={e.active}>
+          <p
+            onClick={(ev) => {
+              activate(e.id);
+            }}
+          >
+            {e.title}
+          </p>
           <button onClick={(ev) => removeTab(e.id)}>×</button>
         </div>
       ))}

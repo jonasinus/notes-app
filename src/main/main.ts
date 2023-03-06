@@ -15,6 +15,7 @@ import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { lstat, readdir, stat } from 'fs/promises';
+import { readFileSync, readSync } from 'fs';
 
 class AppUpdater {
   constructor() {
@@ -125,6 +126,16 @@ async function deepScanFileSystem(startPath: string): Promise<any> {
   }
 }
 
+function readFile(path: string) {
+  let contents: Buffer;
+  try {
+    contents = readFileSync(path);
+  } catch {
+    contents = Buffer.from('empty', 'utf-8');
+  }
+  return contents;
+}
+
 let mainWindow: BrowserWindow | null = null;
 
 ipcMain.on('ipc-example', async (event, arg) => {
@@ -136,6 +147,12 @@ ipcMain.on('ipc-example', async (event, arg) => {
 ipcMain.on('load-vault', async (event, arg) => {
   let vault = await deepScanFileSystem(VAULT_PATH);
   event.reply('load-vault', vault);
+});
+
+ipcMain.on('get-file-contents', (event, obj) => {
+  console.log(obj);
+  let contents = readFile(obj.path);
+  event.reply('get-file-contents', contents);
 });
 
 ipcMain.on('restart-all', async (args) => {
