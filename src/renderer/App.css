@@ -117,23 +117,6 @@ body {
   font-size: 0px;
 }
 
-.main-menu {
-  position: fixed;
-  top: var(--title-bar-height);
-  left: var(--main-nav-width);
-  height: 100%;
-  width: var(--main-menu-width);
-  padding: 10px 0;
-  transition: all 200ms;
-  z-index: 2;
-}
-
-.main-menu.collapsed {
-  width: 0px;
-  opacity: 0;
-  pointer-events: none;
-}
-
 .main-nav {
   position: fixed;
   top: var(--title-bar-height);
@@ -219,17 +202,14 @@ button.create-tab {
   transition: left 200ms;
 }
 
-.tab-manager > .tabs.menu-expanded {
-  left: calc(var(--main-nav-width) + var(--main-menu-width));
-}
-
 .tab-manager > .tabs > .tab {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   width: calc(100vw - var(--main-nav-width));
   height: calc(100vh - var(--title-bar-height));
   transition: width 200ms;
+  display: grid;
+  grid-template-columns: var(--main-menu-width) calc(
+      100vw - var(--main-nav-width) - var(--main-menu-width)
+    );
 }
 
 .tab-manager > .tabs > .tab[data-active='false'] {
@@ -237,7 +217,11 @@ button.create-tab {
 }
 
 .tab-manager > .tabs.menu-expanded > .tab {
-  width: calc(100vw - var(--main-nav-width) - var(--main-menu-width));
+  grid-template-columns: 0vw calc(100vw - var(--main-nav-width));
+}
+
+.tab-manager > .tabs.menu-expanded > .tab > .main-menu {
+  display: none;
 }
 
 svg {
@@ -279,7 +263,7 @@ svg {
     100vh - var(--widget-spacing-top) - var(--widget-spacing-bottom)
   );
   width: 100%;
-  height: 20vh;
+  min-height: 20vh;
   background-color: transparent;
   transition: 200ms ease-in-out;
   border: 1px solid var(--border-subtile-color);

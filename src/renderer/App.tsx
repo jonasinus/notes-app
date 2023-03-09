@@ -44,7 +44,9 @@ export function App() {
     now: menuStates;
   }>({ before: menuStates.COLLAPSED, now: menuStates.FILES });
   const [widget, setWidget] = useState<widgets>('null');
-  const [bunker, setBunker] = useState<Directory | undefined>(undefined);
+  const [bunker, setBunker] = useState<Directory | 'error' | undefined>(
+    undefined
+  );
 
   function handleWidget(to: widgets) {
     if (widget === to) {
@@ -81,6 +83,7 @@ export function App() {
         bunker={bunker}
       />
       <TabManager
+        bunker={bunker}
         menuState={menuState}
         setMenuState={setMenuState}
         widgetHandler={handleWidget}

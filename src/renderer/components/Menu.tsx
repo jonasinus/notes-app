@@ -1,6 +1,6 @@
 import AddFileIcon from 'icons/addFile.svg';
 import { FolderIcon } from 'icons/FolderIcon';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { menuStates, Directory, File } from 'renderer/App';
 import { restartApp } from './util/system';
 import { MenuItem } from './MenuItem';
@@ -12,7 +12,7 @@ export function Menu({
   data,
 }: {
   state: { before: menuStates; now: menuStates };
-  data: Directory | undefined;
+  data: Directory | 'error' | undefined;
 }) {
   if (
     state.now === menuStates.FILES ||
@@ -21,7 +21,9 @@ export function Menu({
     function mapDir(
       e: Directory | File,
       index: number,
-      startCollapsed: boolean
+      startCollapsed: boolean,
+      openItems: string[],
+      setOpenItems: Function
     ) {
       return (
         <MenuItem
@@ -29,13 +31,37 @@ export function Menu({
           n={0}
           totalItems={e.contents.length}
           position={index}
-          open={!startCollapsed}
+          open
           key={e.name + e.contentSizeBytes + e.contents.length + index}
+          openItems={openItems}
+          setOpenItems={setOpenItems}
         />
       );
     }
 
     const [startCollapsed, setStartCollapsed] = useState(true);
+
+    const [openItems, setOpenItems] = useState<string[]>([]);
+
+    function handleOpenItem(id: string) {
+      console.log('opeing menu at id:', id);
+      if (openItems.includes(id)) {
+        setOpenItems(openItems.filter((i) => i !== id));
+      } else {
+        setOpenItems([...openItems, id]);
+      }
+    }
+
+    useEffect(() => {
+      let loc = localStorage.getItem('menuOpenItems');
+      if (loc) {
+        setOpenItems(JSON.parse(loc));
+      }
+    }, []);
+
+    useEffect(() => {
+      localStorage.setItem('menuOpenItems', JSON.stringify(openItems));
+    }, [openItems]);
 
     return (
       <div
@@ -58,11 +84,18 @@ export function Menu({
           </button>
         </menu>
         <menu className="bottom file-list">
-          {data !== undefined ? (
+          {data !== undefined && data !== 'error' ? (
             <div>
               <h4 className="vault-name">{data.name}</h4>
-              <div className="contents">{mapDir(data, 0, startCollapsed)}</div>
+              <div className="contents">
+                {mapDir(data, 0, startCollapsed, openItems, handleOpenItem)}
+              </div>
             </div>
+          ) : data !== 'error' ? (
+            <>
+              indexing your bunker. is your bunker is very large (thousands of
+              items) this might take a while
+            </>
           ) : (
             <>
               there was an error accessing your bunker. make sure the path you

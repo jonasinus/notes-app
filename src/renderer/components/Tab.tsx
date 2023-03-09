@@ -15,6 +15,7 @@ export interface tabProps {
   menuState: { now: menuStates; before: menuStates };
   setMenuState: Function;
   widgetHandler: Function;
+  bunker: Directory | 'error' | undefined;
 }
 
 export type tab = {
@@ -47,6 +48,7 @@ export function Tab(props: tabProps) {
   if (props.path === null)
     return (
       <EmptyTab
+        bunker={props.bunker}
         active
         id={props.id}
         mode={props.mode}
@@ -69,6 +71,32 @@ export function Tab(props: tabProps) {
       </div>
     </>
   );
+
+  function EmptyTab(props: tabProps) {
+    return (
+      <div className="tab empty">
+        <Menu
+          state={{
+            before: props.menuState.before,
+            now: props.menuState.now,
+          }}
+          data={props.bunker}
+        />
+        <ul className="options">
+          <li
+            className="option"
+            onClick={(e) => {
+              props.widgetHandler('search');
+            }}
+          >
+            create a file
+          </li>
+          <li className="option">open a file</li>
+          <li className="option">search recent files</li>
+        </ul>
+      </div>
+    );
+  }
 }
 
 function Editor({
@@ -99,30 +127,9 @@ function Editor({
   }, []);
 
   return (
-    <div>
+    <div className="editor">
       <textarea value={raw} onChange={(e) => setRaw(e.target.value)}></textarea>
       <div dangerouslySetInnerHTML={{ __html: parseFromRaw(raw) }}></div>
-    </div>
-  );
-}
-
-function getContents(path: string) {}
-
-function EmptyTab(props: tabProps) {
-  return (
-    <div className="tab empty">
-      <ul className="options">
-        <li
-          className="option"
-          onClick={(e) => {
-            props.widgetHandler('search');
-          }}
-        >
-          create a file
-        </li>
-        <li className="option">open a file</li>
-        <li className="option">search recent files</li>
-      </ul>
     </div>
   );
 }

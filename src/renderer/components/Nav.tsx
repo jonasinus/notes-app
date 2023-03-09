@@ -27,7 +27,7 @@ export function Nav({
   setMenuState: Function;
   widget: widgets;
   setWidget: Function;
-  bunker: Directory | undefined;
+  bunker: Directory | 'error' | undefined;
 }) {
   const [focus, setFocus] = useState<string | null>(null);
 
@@ -72,13 +72,6 @@ export function Nav({
           </li>
         </ul>
       </nav>
-      <Menu
-        state={{
-          before: menuState.before,
-          now: menuState.now,
-        }}
-        data={bunker}
-      />
     </>
   );
 

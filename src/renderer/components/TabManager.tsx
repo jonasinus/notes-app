@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react';
 import { tab, Tab } from './Tab';
 import { Titlebar } from './Titlebar';
-import { menuStates } from 'renderer/App';
+import { Directory, menuStates } from 'renderer/App';
 
 export function TabManager({
   menuState,
   setMenuState,
   widgetHandler,
+  bunker,
 }: {
   menuState: { now: menuStates; before: menuStates };
   setMenuState: Function;
   widgetHandler: Function;
+  bunker: Directory | 'error' | undefined;
 }) {
   const [tabs, setTabs] = useState<tab[]>([]);
   const [tabElements, setTabElements] = useState<JSX.Element[]>([]);
@@ -164,6 +166,7 @@ export function TabManager({
               }}
               setMenuState={setMenuState}
               widgetHandler={widgetHandler}
+              bunker={bunker}
             />
           );
         })}

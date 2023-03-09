@@ -8,12 +8,16 @@ export function MenuItem({
   totalItems,
   position,
   open,
+  openItems,
+  setOpenItems,
 }: {
   e: File | Directory;
   n: number;
   totalItems: number;
   position: number;
   open: boolean;
+  openItems: string[];
+  setOpenItems: Function;
 }) {
   let ud = <p>|</p>; //up down
   let lrd = <p>┬</p>; //left right down
@@ -51,12 +55,16 @@ export function MenuItem({
     return <>{r.map((e) => e)}</>;
   }
 
-  if (e.isDir)
+  if (e.isDir) {
+    let id = e.name + e.createdAt + e.contentSizeBytes + e.contents.length;
     return (
       <details
         className="dir"
-        open={open}
-        key={e.name + e.contentSizeBytes + e.contents.length}
+        open
+        key={id}
+        onClick={(ev) => {
+          setOpenItems(id);
+        }}
       >
         <summary>
           <div className="indicators">
@@ -74,10 +82,13 @@ export function MenuItem({
               totalItems={e.contents.length}
               position={ind}
               open={open}
+              openItems={openItems}
+              setOpenItems={setOpenItems}
             />
           ))}
       </details>
     );
+  }
 
   return (
     <div className="file" key={e.name + e.contentSizeBytes + e.contents.length}>

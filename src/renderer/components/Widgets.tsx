@@ -19,7 +19,7 @@ export function WidgetTitleBar({
 }) {
   return (
     <div className="widget-titlebar" ref={ref}>
-      {showTitle ? <h4>{title}</h4> : <h4></h4>}
+      {showTitle ? <h1>{title}</h1> : <h1></h1>}
       <div className="move-menu">
         {!moveable ? (
           <></>
