@@ -6,7 +6,9 @@ export type Channels =
   | 'ipc-example'
   | 'load-vault'
   | 'restart-all'
-  | 'get-file-contents';
+  | 'get-file-contents'
+  | 'save-all'
+  | 'save-file';
 
 const electronHandler = {
   ipcRenderer: {

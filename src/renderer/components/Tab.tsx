@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import DigitalClock from './DigitalClock';
 import { parse } from './util/parse';
 import { Menu } from './Menu';
@@ -30,21 +30,6 @@ export type tab = {
 };
 
 export function Tab(props: tabProps) {
-  const [fsData, setFsData] = useState<Directory>();
-
-  useEffect(() => {
-    console.log(fsData);
-  }, [fsData]);
-
-  useEffect(() => {
-    window.electron.ipcRenderer.on('load-vault', (arg) => {
-      console.log('vault', arg);
-      setFsData(arg as Directory);
-    });
-
-    window.electron.ipcRenderer.sendMessage('load-vault', []);
-  }, []);
-
   if (props.path === null)
     return (
       <EmptyTab
@@ -60,6 +45,21 @@ export function Tab(props: tabProps) {
       />
     );
 
+  const [fsData, setFsData] = useState<Directory>();
+
+  useEffect(() => {
+    console.log(fsData);
+  }, [fsData]);
+
+  useEffect(() => {
+    window.electron.ipcRenderer.getFileContents('get-file-contents', (arg) => {
+      console.log('file', arg);
+      //setFsData(arg as Directory);
+    });
+
+    window.electron.ipcRenderer.sendMessage('get-file-contents', [props.path]);
+  }, []);
+
   return (
     <>
       <div
@@ -67,7 +67,7 @@ export function Tab(props: tabProps) {
         data-active={props.active.valueOf().toString()}
       >
         <Menu state={props.menuState} data={fsData} />
-        <Editor filePath="" mode="edit" contents={''} />
+        <Editor filePath={props.path} mode="edit" contents={''} />
       </div>
     </>
   );
@@ -104,32 +104,58 @@ function Editor({
   mode,
   contents,
 }: {
-  filePath: string;
+  filePath: string | null;
   mode: 'edit' | 'view' | 'draw';
   contents: any;
 }) {
   const [raw, setRaw] = useState(contents);
   const [parsed, setParsed] = useState(parseFromRaw(raw));
+  const [fp, setFp] = useState(filePath);
 
   function parseFromRaw(raw: string) {
     return parse(raw);
   }
 
   useEffect(() => {
-    window.electron.ipcRenderer.getFileContents('get-file-contents', (res) => {
-      console.log('res', new TextDecoder().decode(res));
-      setRaw(new TextDecoder().decode(res));
-    });
-
-    window.electron.ipcRenderer.requestFileContents('get-file-contents', {
-      path: filePath,
+    window.electron.ipcRenderer.on('save-all', (args) => {
+      console.log('save all');
     });
   }, []);
 
+  useEffect(() => {
+    window.electron.ipcRenderer.getFileContents('get-file-contents', (res) => {
+      setRaw(res);
+    });
+
+    window.electron.ipcRenderer.requestFileContents('get-file-contents', {
+      path: fp !== null ? fp : '',
+    });
+  }, [fp]);
+
+  useEffect(() => {
+    setParsed(parse(raw));
+  }, [raw]);
+
+  const input = useRef<any>();
+
   return (
     <div className="editor">
+      <button
+        type="button"
+        onClick={(e) => {
+          window.electron.ipcRenderer.sendMessage('save-file', [filePath, raw]);
+        }}
+      >
+        save
+      </button>
+      <input
+        type="text"
+        ref={input}
+        placeholder="file path"
+        onChange={(e) => setFp(e.target.value)}
+      />
       <textarea value={raw} onChange={(e) => setRaw(e.target.value)}></textarea>
-      <div dangerouslySetInnerHTML={{ __html: parseFromRaw(raw) }}></div>
+      <div dangerouslySetInnerHTML={{ __html: parsed }}></div>
     </div>
   );
 }

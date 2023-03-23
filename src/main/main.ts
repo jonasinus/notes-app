@@ -15,7 +15,7 @@ import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 import { lstat, readdir, stat } from 'fs/promises';
-import { readFileSync, readSync } from 'fs';
+import { readFileSync, readSync, writeFileSync } from 'fs';
 
 class AppUpdater {
   constructor() {
@@ -25,7 +25,8 @@ class AppUpdater {
   }
 }
 
-const VAULT_PATH = 'C:/Users/Jonas/Documents/code/notes-app/v10/default-bunker';
+const VAULT_PATH =
+  'C:/Users/Jonas/Documents/code/notes-app/v11/default-bunker/';
 
 interface Directory {
   createdAt: Number;
@@ -35,6 +36,7 @@ interface Directory {
   contentSizeBytes: number;
   name: string;
   isDir: true;
+  path: string;
 }
 
 interface File {
@@ -93,6 +95,7 @@ async function getDirectoryContents(dirPath: string): Promise<Directory> {
     contentSizeBytes,
     name,
     isDir,
+    path: dirPath,
   };
 }
 
@@ -126,16 +129,6 @@ async function deepScanFileSystem(startPath: string): Promise<any> {
   }
 }
 
-function readFile(path: string) {
-  let contents: Buffer;
-  try {
-    contents = readFileSync(path);
-  } catch {
-    contents = Buffer.from('empty', 'utf-8');
-  }
-  return contents;
-}
-
 let mainWindow: BrowserWindow | null = null;
 
 ipcMain.on('ipc-example', async (event, arg) => {
@@ -149,9 +142,17 @@ ipcMain.on('load-vault', async (event, arg) => {
   event.reply('load-vault', vault);
 });
 
-ipcMain.on('get-file-contents', (event, obj) => {
-  console.log(obj);
-  let contents = readFile(obj.path);
+ipcMain.on('get-file-contents', (event, args) => {
+  let obj = { path: args[0] };
+  console.log('opening note: ', VAULT_PATH + obj.path, 'utf-8');
+
+  if (obj.path == undefined || obj.path == '') {
+    console.log('path may never be null nor undefined');
+    return;
+  }
+
+  let contents = readFileSync(VAULT_PATH + obj.path, { encoding: 'utf-8' });
+
   event.reply('get-file-contents', contents);
 });
 
@@ -273,3 +274,14 @@ app
     });
   })
   .catch(console.log);
+
+app.on('before-quit', () => {
+  mainWindow?.webContents.send('save-all', []);
+});
+
+ipcMain.on('save-file', (event, args) => {
+  console.log(args);
+  let path = VAULT_PATH + args[0];
+  let contents = args[1];
+  writeFileSync(path, contents);
+});

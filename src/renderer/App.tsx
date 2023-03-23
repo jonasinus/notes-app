@@ -1,5 +1,5 @@
 import './App.css';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Titlebar } from './components/Titlebar';
 import { Nav } from './components/Nav';
 import { TabManager } from './components/TabManager';
@@ -21,6 +21,7 @@ export interface Directory {
   contentSizeBytes: number;
   name: string;
   isDir: true;
+  path: string;
 }
 
 export interface File {
@@ -47,6 +48,7 @@ export function App() {
   const [bunker, setBunker] = useState<Directory | 'error' | undefined>(
     undefined
   );
+  const tabManagerRef = useRef<any>(null);
 
   function handleWidget(to: widgets) {
     if (widget === to) {
@@ -62,6 +64,12 @@ export function App() {
       setBunker(arg as Directory);
     });
     window.electron.ipcRenderer.sendMessage('load-vault', []);
+  }
+
+  function createTab() {
+    console.log('creating new tab.....');
+
+    if (tabManagerRef.current != null) tabManagerRef.current.createTab();
   }
 
   function exitBunker() {}
@@ -87,6 +95,7 @@ export function App() {
         menuState={menuState}
         setMenuState={setMenuState}
         widgetHandler={handleWidget}
+        tabManagerRef={tabManagerRef}
       />
       <div className="widgets" data-widget-visible={widget.toString()}>
         <Widget
@@ -119,7 +128,9 @@ export function App() {
         <Widget
           title={'search / create'}
           moveable={'left-right'}
-          content={<>hello</>}
+          content={
+            <SearchWidgetContext createTab={createTab} bunker={bunker} />
+          }
           classname={['widget', 'search']}
           showTitle={false}
           visible={widget === 'search'}
@@ -127,5 +138,143 @@ export function App() {
         />
       </div>
     </div>
+  );
+}
+
+function searchFiles(bunker: Directory, term: string) {
+  let elements: File[] = [];
+  bunker.contents.forEach((e, i) => {
+    if (e.isDir) elements.push(...searchFiles(e, term));
+    else {
+      if (e.basename.includes(term)) elements.push(e);
+    }
+  });
+  return elements;
+}
+
+function searchDir2(
+  bunker: Directory,
+  term: string,
+  mode: 'file' | 'dir' | 'all'
+) {
+  let elements: (File | Directory)[] = [];
+
+  bunker.contents.forEach((e, i) => {
+    if (mode == 'file') {
+      if (e.isDir) elements.push(...searchDir2(e, term, 'file'));
+      else {
+        const basenameParts = e.basename.split(' ');
+        const termParts = term.split(' ');
+        const matchingParts = basenameParts.filter((part) =>
+          termParts.some((termPart) => part.includes(termPart))
+        );
+        if (matchingParts.length > 0) elements.push(e);
+      }
+    }
+    if (mode == 'all') {
+      if (e.isDir) {
+        elements.push(...searchDir2(e, term, 'all'));
+        const nameParts = e.name.split(' ');
+        const termParts = term.split(' ');
+        const matchingParts = nameParts.filter((part) =>
+          termParts.some((termPart) => part.includes(termPart))
+        );
+        if (matchingParts.length > 0) elements.push(e);
+      } else {
+        const basenameParts = e.basename.split(' ');
+        const termParts = term.split(' ');
+        const matchingParts = basenameParts.filter((part) =>
+          termParts.some((termPart) => part.includes(termPart))
+        );
+        if (matchingParts.length > 0) elements.push(e);
+      }
+    }
+    if (mode == 'dir') {
+      e.contents.forEach((j) => {
+        if (j.isDir) elements.push(...searchDir2(j, term, 'dir'));
+      });
+      if (e.isDir) {
+        const nameParts = e.name.split(' ');
+        const termParts = term.split(' ');
+        const matchingParts = nameParts.filter((part) =>
+          termParts.some((termPart) => part.includes(termPart))
+        );
+        if (matchingParts.length > 0) elements.push(e);
+      }
+    }
+  });
+  return elements;
+}
+
+function SearchWidgetContext({
+  bunker,
+  createTab,
+}: {
+  bunker: Directory | 'error' | undefined;
+  createTab: Function;
+}) {
+  if (bunker == 'error' || bunker == undefined)
+    return <div>you have to open a bunker before you can access it</div>;
+
+  let [input, setInput] = useState('');
+  const [mode, setMode] = useState<'file' | 'dir' | 'all'>('all');
+  const [searchResults, setSearchResults] = useState<(File | Directory)[]>([]);
+
+  const highlightMatches = (inputValue: string, s: string) => {
+    if (inputValue && s.includes(inputValue)) {
+      const startIndex = s.indexOf(inputValue);
+      const endIndex = startIndex + inputValue.length;
+      const beforeMatch = s.slice(0, startIndex);
+      const match = s.slice(startIndex, endIndex);
+      const afterMatch = s.slice(endIndex);
+      return (
+        <>
+          {beforeMatch}
+          <span className="highlight">{match}</span>
+          {afterMatch}
+        </>
+      );
+    }
+    return s;
+  };
+
+  return (
+    <>
+      <input
+        type="text"
+        value={' '}
+        onInput={(e) => {
+          setInput(e.currentTarget.value);
+          setSearchResults(searchDir2(bunker, e.currentTarget.value, mode));
+        }}
+      />
+      <div>
+        <input type="button" value="file" onClick={(e) => setMode('file')} />
+        <input type="button" value="dir" onClick={(e) => setMode('dir')} />
+        <input type="button" value="all" onClick={(e) => setMode('all')} />
+      </div>
+      <ul className="search-results">
+        {searchResults
+          .sort((a, b) => {
+            return a.isDir && !b.isDir ? 1 : !a.isDir && b.isDir ? -1 : 0;
+          })
+          .map((e, i) => {
+            console.log(e, e.path);
+
+            return (
+              <li
+                key={e.path}
+                onClick={(e) => {
+                  console.log(e);
+
+                  createTab;
+                }}
+              >
+                {highlightMatches(input, e.name)}
+              </li>
+            );
+          })}
+      </ul>
+    </>
   );
 }

@@ -1,19 +1,17 @@
-import { useEffect, useState } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
 import { tab, Tab } from './Tab';
 import { Titlebar } from './Titlebar';
 import { Directory, menuStates } from 'renderer/App';
 
-export function TabManager({
-  menuState,
-  setMenuState,
-  widgetHandler,
-  bunker,
-}: {
+interface Props {
   menuState: { now: menuStates; before: menuStates };
   setMenuState: Function;
   widgetHandler: Function;
   bunker: Directory | 'error' | undefined;
-}) {
+  tabManagerRef: React.MutableRefObject<any>;
+}
+
+export const TabManager = forwardRef((props: Props, ref: any) => {
   const [tabs, setTabs] = useState<tab[]>([]);
   const [tabElements, setTabElements] = useState<JSX.Element[]>([]);
   const [currentTab, setCurrentTab] = useState<tab>({
@@ -79,7 +77,7 @@ export function TabManager({
     }
     tab.id = getUnusedTabId();
     tab.title = `new tab [${tab.id}]`;
-    console.log('created a new tab:', tab.id);
+    console.log('created a new tab:', tab);
     setTabs([...tabs, tab]);
     setCurrentTab(tab);
   }
@@ -133,6 +131,10 @@ export function TabManager({
     console.log(currentTab);
   }, [currentTab]);
 
+  useImperativeHandle(ref, () => ({
+    createTab,
+  }));
+
   return (
     <div className="tab-manager">
       <TabBar
@@ -144,11 +146,11 @@ export function TabManager({
       <div
         className={[
           'tabs',
-          menuState.now === menuStates.COLLAPSED
+          props.menuState.now === menuStates.COLLAPSED
             ? 'menu-collapsed'
             : 'menu-expanded',
         ].join(' ')}
-        menu-open={(menuState.now !== menuStates.COLLAPSED)
+        menu-open={(props.menuState.now !== menuStates.COLLAPSED)
           .valueOf()
           .toString()}
       >
@@ -164,16 +166,17 @@ export function TabManager({
                 now: menuStates.FILES,
                 before: menuStates.COLLAPSED,
               }}
-              setMenuState={setMenuState}
-              widgetHandler={widgetHandler}
-              bunker={bunker}
+              setMenuState={props.setMenuState}
+              widgetHandler={props.widgetHandler}
+              bunker={props.bunker}
+              key={e.filePath}
             />
           );
         })}
       </div>
     </div>
   );
-}
+});
 
 function TabBar({
   tabs,
@@ -206,3 +209,5 @@ function TabBar({
     </div>
   );
 }
+
+function tabHandler() {}

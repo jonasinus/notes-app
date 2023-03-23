@@ -32,7 +32,6 @@ export function Menu({
           totalItems={e.contents.length}
           position={index}
           open
-          key={e.name + e.contentSizeBytes + e.contents.length + index}
           openItems={openItems}
           setOpenItems={setOpenItems}
         />

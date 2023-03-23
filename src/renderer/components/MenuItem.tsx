@@ -56,7 +56,12 @@ export function MenuItem({
   }
 
   if (e.isDir) {
-    let id = e.name + e.createdAt + e.contentSizeBytes + e.contents.length;
+    let id =
+      e.name +
+      e.createdAt +
+      e.contentSizeBytes +
+      e.contents.length +
+      Math.random() * 84639;
     return (
       <details
         className="dir"
