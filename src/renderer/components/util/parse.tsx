@@ -12,8 +12,32 @@ export function parse(s: string): string {
     /(\|)(.*?)(\|)/g,
     JSXToString(<span className="blurred-text">$2</span>)
   ); // |...| for blurring text between
-  s = s.replace(/(\[\[)(.*?)(\]\])/g, JSXToString(<p>$2</p>)); // [[...]] for creating a  link
-
+  s = s.replace(
+    /(\[\[)(.*?)(\]\])/g,
+    JSXToString(<span className="link">$2</span>)
+  ); // [[...]] for creating a  link
+  s = s.replace(
+    /(\`\`\`)(([^\s]+))([\s\S]*?)(\`\`\`)/gms, // ```lang ... ``` for code blocks
+    JSXToString(
+      <>
+        <br />
+        <span className={['codeblock', '$3'].join(' ')}>[$3]$4</span>
+        <br />
+      </>
+    )
+  );
+  s = s.replace(
+    /(\>\>)(.*?)(\<\<)/g,
+    JSXToString(<span className="justify center">$2</span>)
+  );
+  s = s.replace(
+    /(\>\>)(.*?)(\|)/g,
+    JSXToString(<span className="justify right">$2</span>)
+  );
+  s = s.replace(
+    /(\|)(.*?)(\<\<)/g,
+    JSXToString(<span className="justify left">$2</span>)
+  );
   return s;
 }
 

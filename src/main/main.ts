@@ -50,6 +50,9 @@ interface File {
   isDir: false;
 }
 
+let lastDeepScan = {};
+let lastDeepScanned = new Date();
+
 async function getDirectoryContents(dirPath: string): Promise<Directory> {
   const contents = await readdir(dirPath);
   const dirStats = await stat(dirPath);
@@ -109,10 +112,13 @@ function formatSizeUnits(bytes: number): string {
   return `${bytes.toFixed(2)} ${units[index]}`;
 }
 
+const hourDiff = (date1: any, date2: any) => Math.abs(date1 - date2) / 36e5;
+
 async function deepScanFileSystem(startPath: string): Promise<any> {
   const stats = await stat(startPath);
   if (stats.isDirectory()) {
     const dir = await getDirectoryContents(startPath);
+    if (dir != lastDeepScan) lastDeepScan = dir;
     return dir;
   } else {
     const file: File = {
@@ -125,6 +131,7 @@ async function deepScanFileSystem(startPath: string): Promise<any> {
       contents: [],
       isDir: false,
     };
+    if (file != lastDeepScan) lastDeepScan = file;
     return file;
   }
 }
@@ -151,7 +158,16 @@ ipcMain.on('get-file-contents', (event, args) => {
     return;
   }
 
-  let contents = readFileSync(VAULT_PATH + obj.path, { encoding: 'utf-8' });
+  let contents;
+  try {
+    contents = readFileSync(VAULT_PATH + obj.path, { encoding: 'utf-8' });
+  } catch {
+    contents =
+      'error opening file ({path: "' +
+      VAULT_PATH +
+      obj.path +
+      '", encoding: "utf-8", forced: false})';
+  }
 
   event.reply('get-file-contents', contents);
 });

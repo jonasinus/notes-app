@@ -2,8 +2,9 @@ import './App.css';
 import { useState, useEffect, useRef } from 'react';
 import { Titlebar } from './components/Titlebar';
 import { Nav } from './components/Nav';
-import { TabManager } from './components/TabManager';
+import { TabManager, getUnusedTabId } from './components/TabManager';
 import { SettingsWidgetContent, Widget } from './components/Widgets';
+import { tab } from './components/Tab';
 
 export enum menuStates {
   'FILES',
@@ -48,7 +49,7 @@ export function App() {
   const [bunker, setBunker] = useState<Directory | 'error' | undefined>(
     undefined
   );
-  const tabManagerRef = useRef<any>(null);
+  const [tabs, setTabs] = useState<tab[]>([]);
 
   function handleWidget(to: widgets) {
     if (widget === to) {
@@ -66,13 +67,28 @@ export function App() {
     window.electron.ipcRenderer.sendMessage('load-vault', []);
   }
 
-  function createTab() {
-    console.log('creating new tab.....');
-
-    if (tabManagerRef.current != null) tabManagerRef.current.createTab();
-  }
-
   function exitBunker() {}
+
+  function createTab(s: string) {
+    console.log('creating new tab from App.tsx (' + s + ')');
+    let tab: tab | undefined = undefined;
+    if (tab === undefined) {
+      tab = {
+        title: 'new tab [',
+        id: 0,
+        active: true,
+        mode: 'fileview',
+        collapsed: false,
+        filePath: './' + s,
+        raw: '',
+        parsed: <></>,
+      };
+    }
+    tab.id = getUnusedTabId(tabs);
+    tab.title = `new tab [${tab.id}]`;
+    console.log('created a new tab:', tab);
+    setTabs([...tabs, tab]);
+  }
 
   useEffect(() => {
     enterBunker();
@@ -95,7 +111,8 @@ export function App() {
         menuState={menuState}
         setMenuState={setMenuState}
         widgetHandler={handleWidget}
-        tabManagerRef={tabManagerRef}
+        tabs={tabs}
+        setTabs={setTabs}
       />
       <div className="widgets" data-widget-visible={widget.toString()}>
         <Widget
@@ -206,12 +223,37 @@ function searchDir2(
   return elements;
 }
 
+function SearchWidgetContext2({
+  createTab,
+}: {
+  createTab: (s: string) => void;
+}) {
+  const [p, setP] = useState('');
+  return (
+    <>
+      <input
+        type="text"
+        onInput={(e) => {
+          setP(e.currentTarget.value);
+        }}
+      />
+      <input
+        type="button"
+        value="open"
+        onClick={(e) => {
+          createTab(p);
+        }}
+      />
+    </>
+  );
+}
+
 function SearchWidgetContext({
   bunker,
   createTab,
 }: {
   bunker: Directory | 'error' | undefined;
-  createTab: Function;
+  createTab: (s: string) => void;
 }) {
   if (bunker == 'error' || bunker == undefined)
     return <div>you have to open a bunker before you can access it</div>;
@@ -238,6 +280,8 @@ function SearchWidgetContext({
     return s;
   };
 
+  return <SearchWidgetContext2 createTab={createTab} />;
+  /*
   return (
     <>
       <input
@@ -267,7 +311,7 @@ function SearchWidgetContext({
                 onClick={(e) => {
                   console.log(e);
 
-                  createTab;
+                  createTab();
                 }}
               >
                 {highlightMatches(input, e.name)}
@@ -276,5 +320,6 @@ function SearchWidgetContext({
           })}
       </ul>
     </>
-  );
+    );
+    */
 }

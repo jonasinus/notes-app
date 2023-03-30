@@ -7,7 +7,7 @@ export function WidgetTitleBar({
   setPos,
   showTitle,
   hide,
-  ref,
+  Ref,
 }: {
   title: string;
   moveable: 'left' | 'right' | 'left-right' | false;
@@ -15,10 +15,10 @@ export function WidgetTitleBar({
   setPos: Function;
   showTitle: boolean;
   hide: Function;
-  ref: any;
+  Ref: any;
 }) {
   return (
-    <div className="widget-titlebar" ref={ref}>
+    <div className="widget-titlebar" ref={Ref}>
       {showTitle ? <h1>{title}</h1> : <h1></h1>}
       <div className="move-menu">
         {!moveable ? (
@@ -102,7 +102,7 @@ export function Widget(props: widgetProps) {
         pos={pos}
         setPos={setPos}
         showTitle={props.showTitle}
-        ref={widgetBarRef}
+        Ref={widgetBarRef}
       />
       <div>{props.content}</div>
     </div>

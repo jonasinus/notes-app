@@ -15,8 +15,10 @@ export interface tabProps {
   menuState: { now: menuStates; before: menuStates };
   setMenuState: Function;
   widgetHandler: Function;
-  bunker: Directory | 'error' | undefined;
+  bunker: Bunker;
 }
+
+type Bunker = Directory | 'error' | undefined;
 
 export type tab = {
   title: string;
@@ -45,19 +47,15 @@ export function Tab(props: tabProps) {
       />
     );
 
-  const [fsData, setFsData] = useState<Directory>();
+  const [fsData, setFsData] = useState(props.bunker);
 
   useEffect(() => {
-    console.log(fsData);
-  }, [fsData]);
-
-  useEffect(() => {
-    window.electron.ipcRenderer.getFileContents('get-file-contents', (arg) => {
-      console.log('file', arg);
-      //setFsData(arg as Directory);
+    window.electron.ipcRenderer.getFileContents('load-vault', (arg) => {
+      console.log('bunker', arg);
+      setFsData(arg as unknown as Bunker);
     });
 
-    window.electron.ipcRenderer.sendMessage('get-file-contents', [props.path]);
+    window.electron.ipcRenderer.sendMessage('load-vault', [props.path]);
   }, []);
 
   return (
@@ -82,18 +80,20 @@ export function Tab(props: tabProps) {
           }}
           data={props.bunker}
         />
-        <ul className="options">
-          <li
-            className="option"
-            onClick={(e) => {
-              props.widgetHandler('search');
-            }}
-          >
-            create a file
-          </li>
-          <li className="option">open a file</li>
-          <li className="option">search recent files</li>
-        </ul>
+        <div className="content">
+          <ul className="options">
+            <li
+              className="option"
+              onClick={(e) => {
+                props.widgetHandler('search');
+              }}
+            >
+              create a file
+            </li>
+            <li className="option">open a file</li>
+            <li className="option">search recent files</li>
+          </ul>
+        </div>
       </div>
     );
   }
@@ -110,7 +110,7 @@ function Editor({
 }) {
   const [raw, setRaw] = useState(contents);
   const [parsed, setParsed] = useState(parseFromRaw(raw));
-  const [fp, setFp] = useState(filePath);
+  const [editorMode, setEditorMode] = useState<'edit' | 'view' | 'draw'>(mode);
 
   function parseFromRaw(raw: string) {
     return parse(raw);
@@ -128,34 +128,58 @@ function Editor({
     });
 
     window.electron.ipcRenderer.requestFileContents('get-file-contents', {
-      path: fp !== null ? fp : '',
+      path: filePath !== null ? filePath : '',
     });
-  }, [fp]);
+  }, [filePath]);
 
   useEffect(() => {
     setParsed(parse(raw));
   }, [raw]);
 
-  const input = useRef<any>();
-
   return (
-    <div className="editor">
-      <button
-        type="button"
-        onClick={(e) => {
-          window.electron.ipcRenderer.sendMessage('save-file', [filePath, raw]);
-        }}
-      >
-        save
-      </button>
-      <input
+    <div data-editor-mode={editorMode} className="content">
+      <div className="navigation">
+        <button
+          type="button"
+          onClick={(e) => {
+            window.electron.ipcRenderer.sendMessage('save-file', [
+              filePath,
+              raw,
+            ]);
+          }}
+        >
+          save
+        </button>
+        <button
+          onClick={(e) => {
+            setEditorMode('draw');
+          }}
+        >
+          draw
+        </button>
+        <button
+          onClick={(e) => setEditorMode(editorMode == 'edit' ? 'view' : 'edit')}
+        >
+          {editorMode == 'edit' ? 'view' : 'edit'}
+        </button>
+      </div>
+      <div className={['editor', mode].join(' ')}>
+        {/*<input
         type="text"
         ref={input}
         placeholder="file path"
         onChange={(e) => setFp(e.target.value)}
-      />
-      <textarea value={raw} onChange={(e) => setRaw(e.target.value)}></textarea>
-      <div dangerouslySetInnerHTML={{ __html: parsed }}></div>
+      />*/}
+        <textarea
+          value={raw}
+          onChange={(e) => setRaw(e.target.value)}
+          className="edit"
+        ></textarea>
+        <div
+          dangerouslySetInnerHTML={{ __html: parsed }}
+          className="view"
+        ></div>
+      </div>
     </div>
   );
 }

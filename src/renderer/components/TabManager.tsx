@@ -8,12 +8,11 @@ interface Props {
   setMenuState: Function;
   widgetHandler: Function;
   bunker: Directory | 'error' | undefined;
-  tabManagerRef: React.MutableRefObject<any>;
+  tabs: tab[];
+  setTabs: Function;
 }
 
-export const TabManager = forwardRef((props: Props, ref: any) => {
-  const [tabs, setTabs] = useState<tab[]>([]);
-  const [tabElements, setTabElements] = useState<JSX.Element[]>([]);
+export const TabManager = (props: Props) => {
   const [currentTab, setCurrentTab] = useState<tab>({
     title: 'string',
     id: 0,
@@ -26,21 +25,23 @@ export const TabManager = forwardRef((props: Props, ref: any) => {
   });
 
   useEffect(() => {
-    const { t, changed } = correctTabActive(tabs, currentTab);
+    console.log(props.tabs);
+
+    const { t, changed } = correctTabActive(props.tabs, currentTab);
 
     if (changed) {
-      setTabs(t);
+      props.setTabs(t);
       return;
     }
-    if (tabs.length <= 0) {
+    if (props.tabs.length <= 0) {
       createTab();
       return;
     }
-    let activeTab = tabs.find((e) => e.active === true);
+    let activeTab = props.tabs.find((e) => e.active === true);
     if (activeTab === undefined) {
-      setActiveTab(tabs[0].id);
+      setActiveTab(props.tabs[0].id);
     }
-  }, [tabs]);
+  }, [props.tabs]);
 
   function correctTabActive(tabs: tab[], tab: tab) {
     let changed = false;
@@ -70,23 +71,23 @@ export const TabManager = forwardRef((props: Props, ref: any) => {
         active: true,
         mode: 'fileview',
         collapsed: false,
-        filePath: null,
+        filePath: './index.md',
         raw: '',
         parsed: <></>,
       };
     }
-    tab.id = getUnusedTabId();
+    tab.id = getUnusedTabId(props.tabs);
     tab.title = `new tab [${tab.id}]`;
     console.log('created a new tab:', tab);
-    setTabs([...tabs, tab]);
+    props.setTabs([...props.tabs, tab]);
     setCurrentTab(tab);
   }
 
   function setActiveTab(id: number) {
     let aT: tab = currentTab;
     let t: tab[] = [];
-    for (let i = 0; i < tabs.length; i++) {
-      let cTab = tabs[i];
+    for (let i = 0; i < props.tabs.length; i++) {
+      let cTab = props.tabs[i];
       cTab.active = cTab.id === id;
       if (cTab.id === id) {
         aT = cTab;
@@ -94,33 +95,23 @@ export const TabManager = forwardRef((props: Props, ref: any) => {
       t.push(cTab);
     }
     setCurrentTab(aT);
-    setTabs(t);
+    props.setTabs(t);
   }
 
   function removeTab(id: number) {
     let t: tab[] = [];
     let rmTab: tab | undefined = undefined;
-    for (let i = 0; i < tabs.length; i++) {
-      let cTab = tabs[i];
+    for (let i = 0; i < props.tabs.length; i++) {
+      let cTab = props.tabs[i];
       if (cTab.id === id) {
         rmTab = cTab;
       } else {
         t.push(cTab);
       }
     }
-    setTabs(t);
+    props.setTabs(t);
     if (rmTab !== undefined) console.log('removed a tab: ', rmTab.id);
     else console.error(`ERROR: unable to remove tab with id: ${id}`);
-  }
-
-  function getUnusedTabId() {
-    let id = 0;
-    let i = tabs.findIndex((e) => e.id === id);
-    while (i > -1) {
-      id = Math.floor(Math.random() * (1 + tabs.length));
-      i = tabs.findIndex((e) => e.id === id);
-    }
-    return id;
   }
 
   useEffect(() => {
@@ -131,14 +122,10 @@ export const TabManager = forwardRef((props: Props, ref: any) => {
     console.log(currentTab);
   }, [currentTab]);
 
-  useImperativeHandle(ref, () => ({
-    createTab,
-  }));
-
   return (
     <div className="tab-manager">
       <TabBar
-        tabs={tabs}
+        tabs={props.tabs}
         removeTab={removeTab}
         createTab={createTab}
         activate={setActiveTab}
@@ -154,7 +141,7 @@ export const TabManager = forwardRef((props: Props, ref: any) => {
           .valueOf()
           .toString()}
       >
-        {tabs.map((e, i) => {
+        {props.tabs.map((e, i) => {
           return (
             <Tab
               id={e.id}
@@ -176,7 +163,7 @@ export const TabManager = forwardRef((props: Props, ref: any) => {
       </div>
     </div>
   );
-});
+};
 
 function TabBar({
   tabs,
@@ -211,3 +198,13 @@ function TabBar({
 }
 
 function tabHandler() {}
+
+export function getUnusedTabId(tabs: tab[]): number {
+  let id = 0;
+  let i = tabs.findIndex((e) => e.id === id);
+  while (i > -1) {
+    id = Math.floor(Math.random() * (1 + tabs.length));
+    i = tabs.findIndex((e) => e.id === id);
+  }
+  return id;
+}

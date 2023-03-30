@@ -16,6 +16,7 @@
   --min-width: 320px;
   --min-height: 100vh;
   --title-bar-height: 40px;
+  --editor-navigation-height: 50px;
   --tab-header-width: 10rem;
   --main-nav-width: 60px;
   --main-menu-width: 300px;
@@ -210,16 +211,13 @@ button.create-tab {
   grid-template-columns: var(--main-menu-width) calc(
       100vw - var(--main-nav-width) - var(--main-menu-width)
     );
+  transition: 300ms;
 }
 
 .tab-manager > .tabs > .tab.empty {
   grid-template-columns: var(--main-menu-width) calc(
-      100vw - var(--main-menu-width)
+      100vw - var(--main-nav-width) - var(--main-menu-width)
     );
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transform: translateY(-10%);
 }
 
 .tab.empty > ul {
@@ -241,7 +239,10 @@ button.create-tab {
 }
 
 .tab-manager > .tabs.menu-expanded > .tab.empty {
-  grid-template-columns: calc(100vw - var(--main-nav-width));
+  grid-template-columns: var(--main-menu-width) calc(
+      100vw - var(--main-nav-width) - var(--main-menu-width)
+    );
+  transition: 300ms;
 }
 
 .tab-manager > .tabs.menu-expanded > .tab > .main-menu {
@@ -406,4 +407,78 @@ details.dir[open] > summary::before {
 .file svg {
   height: 1.5rem;
   width: 100%;
+}
+
+.content > .editor {
+  display: flex;
+  flex-direction: column;
+}
+
+.tab-manager > .tabs > .tab > .content > .editor > .view,
+.tab-manager > .tabs > .tab > .content > .editor .edit {
+  min-height: calc(
+    100vh - var(--title-bar-height) - var(--title-bar-height) -
+      var(--editor-navigation-height)
+  );
+  max-width: calc(
+    100vw - var(--main-menu-width) - var(--main-nav-width) -
+      var(--main-nav-width)
+  );
+  resize: vertical;
+  background-color: #00000060;
+  padding: 1rem;
+  border-radius: 1rem;
+  outline: none;
+}
+
+.tab-manager > .tabs.menu-expanded > .tab > .content > .editor > .edit {
+  width: 100%;
+  height: 100%;
+  min-width: calc(100vw - var(--main-nav-width) - var(--main-nav-width));
+}
+
+.tab-manager > .tabs.menu-expanded > .tab > .content > .editor > .view {
+  width: 100%;
+  height: 100%;
+  min-width: calc(100vw - var(--main-nav-width) - var(--main-nav-width));
+}
+
+.tab-manager
+  > .tabs
+  > .tab
+  > .content[data-editor-mode='view']
+  > .editor
+  > .edit {
+  display: none;
+}
+.tab-manager
+  > .tabs
+  > .tab
+  > .content[data-editor-mode='edit']
+  > .editor
+  > .view {
+  display: none;
+}
+
+.tab-manager > .tabs > .tab > .content > .navigation {
+  height: var(--editor-navigation-height);
+  display: flex;
+  gap: 10px;
+}
+
+.tab-manager > .tabs > .tab > .content > .navigation > button {
+  padding: 5px;
+  background-color: #e9e9e940;
+  border-radius: 5px;
+  height: 25px;
+  align-self: center;
+}
+
+span.codeblock {
+  font-family: monospace;
+  border: 1px solid var(--border-color);
+}
+
+span.link {
+  color: var(--anchor-color);
 }
