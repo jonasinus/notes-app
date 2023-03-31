@@ -27,8 +27,6 @@ export type tab = {
   filePath: string | null;
   mode: tabStates;
   active: boolean;
-  parsed: JSX.Element;
-  raw: string;
 };
 
 export function Tab(props: tabProps) {
@@ -49,13 +47,10 @@ export function Tab(props: tabProps) {
 
   const [fsData, setFsData] = useState(props.bunker);
 
-  useEffect(() => {
-    window.electron.ipcRenderer.getFileContents('load-vault', (arg) => {
-      console.log('bunker', arg);
-      setFsData(arg as unknown as Bunker);
-    });
+  const [c, cC] = useState('');
 
-    window.electron.ipcRenderer.sendMessage('load-vault', [props.path]);
+  useEffect(() => {
+    console.log('path', props.path);
   }, []);
 
   return (
@@ -65,7 +60,12 @@ export function Tab(props: tabProps) {
         data-active={props.active.valueOf().toString()}
       >
         <Menu state={props.menuState} data={fsData} />
-        <Editor filePath={props.path} mode="edit" contents={''} />
+        {props.path}
+        <Editor
+          filePath={props.path}
+          mode="view"
+          contents={'*wait a sec, we are opening your file....*'}
+        />
       </div>
     </>
   );
@@ -99,12 +99,12 @@ export function Tab(props: tabProps) {
   }
 }
 
-function Editor({
+export function Editor({
   filePath,
   mode,
   contents,
 }: {
-  filePath: string | null;
+  filePath: string;
   mode: 'edit' | 'view' | 'draw';
   contents: any;
 }) {
@@ -117,19 +117,20 @@ function Editor({
   }
 
   useEffect(() => {
+    console.log('editor: ', { filePath, mode, raw, parsed });
     window.electron.ipcRenderer.on('save-all', (args) => {
-      console.log('save all');
+      //window.electron.ipcRenderer.sendMessage('save-file', [filePath, raw]);
     });
-  }, []);
 
-  useEffect(() => {
     window.electron.ipcRenderer.getFileContents('get-file-contents', (res) => {
+      console.log('editor[' + filePath + '] res:', res);
+
       setRaw(res);
     });
 
-    window.electron.ipcRenderer.requestFileContents('get-file-contents', {
-      path: filePath !== null ? filePath : '',
-    });
+    console.log('editor', { filePath });
+
+    window.electron.ipcRenderer.sendMessage('get-file-contents', [filePath]);
   }, [filePath]);
 
   useEffect(() => {
@@ -137,7 +138,8 @@ function Editor({
   }, [raw]);
 
   return (
-    <div data-editor-mode={editorMode} className="content">
+    <div data-editor-mode={editorMode} className="content" data-path={filePath}>
+      {filePath}
       <div className="navigation">
         <button
           type="button"

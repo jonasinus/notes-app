@@ -80,8 +80,6 @@ export function App() {
         mode: 'fileview',
         collapsed: false,
         filePath: './' + s,
-        raw: '',
-        parsed: <></>,
       };
     }
     tab.id = getUnusedTabId(tabs);
@@ -241,7 +239,8 @@ function SearchWidgetContext2({
         type="button"
         value="open"
         onClick={(e) => {
-          createTab(p);
+          if (p !== '') createTab(p);
+          else alert('file name may not be empty');
         }}
       />
     </>

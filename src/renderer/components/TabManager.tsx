@@ -1,7 +1,8 @@
 import { forwardRef, useEffect, useImperativeHandle, useState } from 'react';
-import { tab, Tab } from './Tab';
+import { Editor, tab, Tab } from './Tab';
 import { Titlebar } from './Titlebar';
 import { Directory, menuStates } from 'renderer/App';
+import { Menu } from './Menu';
 
 interface Props {
   menuState: { now: menuStates; before: menuStates };
@@ -20,12 +21,12 @@ export const TabManager = (props: Props) => {
     filePath: null,
     mode: 'fileview',
     active: true,
-    parsed: <></>,
-    raw: '',
   });
 
+  const [currentTabEl, setCurrentTabEl] = useState(<></>);
+
   useEffect(() => {
-    console.log(props.tabs);
+    console.log('tabs', { tabs: props.tabs });
 
     const { t, changed } = correctTabActive(props.tabs, currentTab);
 
@@ -41,9 +42,44 @@ export const TabManager = (props: Props) => {
     if (activeTab === undefined) {
       setActiveTab(props.tabs[0].id);
     }
+
+    let tab = props.tabs.find((e) => e.active == true);
+    let fsData: Directory | 'error' = 'error';
+    if (tab)
+      setCurrentTabEl(
+        <>
+          <Tab
+            path={tab.filePath}
+            id={tab.id}
+            active={true}
+            mode={tab.mode}
+            title={tab.title}
+            menuState={{
+              now: menuStates.COLLAPSED,
+              before: menuStates.FILES,
+            }}
+            setMenuState={props.setMenuState}
+            widgetHandler={props.widgetHandler}
+            bunker={props.bunker}
+          />
+          {/*
+          <div
+            className={['tab', tab.id.toString()].join(' ')}
+            data-active={true.valueOf().toString()}
+          >
+            <Menu state={props.menuState} data={fsData} />
+            <Editor
+              filePath={tab.filePath ?? ''}
+              mode="view"
+              contents={'*wait a sec, we are opening your file....*'}
+            />
+          </div>*/}
+        </>
+      );
+    else setCurrentTabEl(<>empty tab</>);
   }, [props.tabs]);
 
-  function correctTabActive(tabs: tab[], tab: tab) {
+  function correctTabActive(tabs: tab[], currentTab: tab) {
     let changed = false;
     let t: tab[] = [];
     tabs.forEach((tab) => {
@@ -72,8 +108,6 @@ export const TabManager = (props: Props) => {
         mode: 'fileview',
         collapsed: false,
         filePath: './index.md',
-        raw: '',
-        parsed: <></>,
       };
     }
     tab.id = getUnusedTabId(props.tabs);
@@ -118,10 +152,6 @@ export const TabManager = (props: Props) => {
     createTab();
   }, []);
 
-  useEffect(() => {
-    console.log(currentTab);
-  }, [currentTab]);
-
   return (
     <div className="tab-manager">
       <TabBar
@@ -141,7 +171,8 @@ export const TabManager = (props: Props) => {
           .valueOf()
           .toString()}
       >
-        {props.tabs.map((e, i) => {
+        {currentTabEl}
+        {/*props.tabs.map((e, i) => {
           return (
             <Tab
               id={e.id}
@@ -159,7 +190,7 @@ export const TabManager = (props: Props) => {
               key={e.filePath}
             />
           );
-        })}
+        })*/}
       </div>
     </div>
   );

@@ -163,10 +163,10 @@ ipcMain.on('get-file-contents', (event, args) => {
     contents = readFileSync(VAULT_PATH + obj.path, { encoding: 'utf-8' });
   } catch {
     contents =
-      'error opening file ({path: "' +
+      'error opening file ({path: "*' +
       VAULT_PATH +
       obj.path +
-      '", encoding: "utf-8", forced: false})';
+      '*", encoding: "*utf-8*", forced: *false*})';
   }
 
   event.reply('get-file-contents', contents);
@@ -301,3 +301,11 @@ ipcMain.on('save-file', (event, args) => {
   let contents = args[1];
   writeFileSync(path, contents);
 });
+
+function forceReload() {
+  mainWindow?.webContents.reloadIgnoringCache();
+}
+
+function reload() {
+  mainWindow?.webContents.reload();
+}
