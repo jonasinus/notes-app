@@ -30,37 +30,32 @@ export type tab = {
 };
 
 export function Tab(props: tabProps) {
-  if (props.path === null)
-    return (
-      <EmptyTab
-        bunker={props.bunker}
-        active
-        id={props.id}
-        mode={props.mode}
-        path={props.path}
-        title={props.title}
-        menuState={props.menuState}
-        setMenuState={props.setMenuState}
-        widgetHandler={props.widgetHandler}
-      />
-    );
-
   const [fsData, setFsData] = useState(props.bunker);
-
   const [c, cC] = useState('');
 
   useEffect(() => {
     console.log('path', props.path);
   }, []);
 
-  return (
+  return props.path == null ? (
+    <EmptyTab
+      bunker={props.bunker}
+      active
+      id={props.id}
+      mode={props.mode}
+      path={props.path}
+      title={props.title}
+      menuState={props.menuState}
+      setMenuState={props.setMenuState}
+      widgetHandler={props.widgetHandler}
+    />
+  ) : (
     <>
       <div
         className={['tab', props.id.toString()].join(' ')}
         data-active={props.active.valueOf().toString()}
       >
         <Menu state={props.menuState} data={fsData} />
-        {props.path}
         <Editor
           filePath={props.path}
           mode="view"
@@ -73,13 +68,7 @@ export function Tab(props: tabProps) {
   function EmptyTab(props: tabProps) {
     return (
       <div className="tab empty">
-        <Menu
-          state={{
-            before: props.menuState.before,
-            now: props.menuState.now,
-          }}
-          data={props.bunker}
-        />
+        <Menu state={props.menuState} data={fsData} />
         <div className="content">
           <ul className="options">
             <li
@@ -139,7 +128,6 @@ export function Editor({
 
   return (
     <div data-editor-mode={editorMode} className="content" data-path={filePath}>
-      {filePath}
       <div className="navigation">
         <button
           type="button"

@@ -50,6 +50,14 @@ export function App() {
     undefined
   );
   const [tabs, setTabs] = useState<tab[]>([]);
+  const [currentTab, setCurrentTab] = useState<tab>({
+    title: 'string',
+    id: 0,
+    collapsed: true,
+    filePath: null,
+    mode: 'fileview',
+    active: true,
+  });
 
   function handleWidget(to: widgets) {
     if (widget === to) {
@@ -86,11 +94,39 @@ export function App() {
     tab.title = `new tab [${tab.id}]`;
     console.log('created a new tab:', tab);
     setTabs([...tabs, tab]);
+    setCurrentTab(tab);
   }
 
   useEffect(() => {
-    enterBunker();
+    setActiveTab(currentTab.id);
+  }, [currentTab]);
+
+  function setActiveTab(id: number) {
+    let aT: tab = currentTab;
+    let t: tab[] = [];
+    for (let i = 0; i < tabs.length; i++) {
+      let cTab = tabs[i];
+      cTab.active = cTab.id === id;
+      if (cTab.id === id) {
+        aT = cTab;
+      }
+      t.push(cTab);
+    }
+    setCurrentTab(aT);
+    setTabs(t);
+  }
+
+  useEffect(() => {
+    setTimeout(() => {
+      enterBunker();
+    }, 2000);
   }, []);
+
+  function registerHotkeys() {
+    document.addEventListener('input', (ev) => {
+      console.log(ev);
+    });
+  }
 
   return (
     <div id="cotnainer">
@@ -111,6 +147,8 @@ export function App() {
         widgetHandler={handleWidget}
         tabs={tabs}
         setTabs={setTabs}
+        currentTab={currentTab}
+        setCurrentTab={setCurrentTab}
       />
       <div className="widgets" data-widget-visible={widget.toString()}>
         <Widget

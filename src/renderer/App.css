@@ -118,6 +118,14 @@ body {
   font-size: 0px;
 }
 
+.titlebar.COLLAPSED {
+  width: var(--main-nav-width);
+}
+
+.titlebar.COLLAPSED > .buttons > button:not(.toggle) {
+  display: none;
+}
+
 .main-nav {
   position: fixed;
   top: var(--title-bar-height);
@@ -165,6 +173,10 @@ button {
   width: calc(100vw - var(--main-nav-width) - var(--main-menu-width));
   -webkit-app-region: drag;
   z-index: 2;
+}
+
+#container > div.titlebar.COLLAPSED ~ div.tab-manager > div.tab-titles {
+  left: var(--main-nav-width);
 }
 
 .tab-manager > .tab-titles > div {

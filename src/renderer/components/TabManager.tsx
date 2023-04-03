@@ -11,24 +11,17 @@ interface Props {
   bunker: Directory | 'error' | undefined;
   tabs: tab[];
   setTabs: Function;
+  currentTab: tab;
+  setCurrentTab: Function;
 }
 
 export const TabManager = (props: Props) => {
-  const [currentTab, setCurrentTab] = useState<tab>({
-    title: 'string',
-    id: 0,
-    collapsed: true,
-    filePath: null,
-    mode: 'fileview',
-    active: true,
-  });
-
   const [currentTabEl, setCurrentTabEl] = useState(<></>);
 
   useEffect(() => {
     console.log('tabs', { tabs: props.tabs });
 
-    const { t, changed } = correctTabActive(props.tabs, currentTab);
+    const { t, changed } = correctTabActive(props.tabs, props.currentTab);
 
     if (changed) {
       props.setTabs(t);
@@ -44,37 +37,24 @@ export const TabManager = (props: Props) => {
     }
 
     let tab = props.tabs.find((e) => e.active == true);
+
     let fsData: Directory | 'error' = 'error';
     if (tab)
       setCurrentTabEl(
-        <>
-          <Tab
-            path={tab.filePath}
-            id={tab.id}
-            active={true}
-            mode={tab.mode}
-            title={tab.title}
-            menuState={{
-              now: menuStates.COLLAPSED,
-              before: menuStates.FILES,
-            }}
-            setMenuState={props.setMenuState}
-            widgetHandler={props.widgetHandler}
-            bunker={props.bunker}
-          />
-          {/*
-          <div
-            className={['tab', tab.id.toString()].join(' ')}
-            data-active={true.valueOf().toString()}
-          >
-            <Menu state={props.menuState} data={fsData} />
-            <Editor
-              filePath={tab.filePath ?? ''}
-              mode="view"
-              contents={'*wait a sec, we are opening your file....*'}
-            />
-          </div>*/}
-        </>
+        <Tab
+          path={tab.filePath}
+          id={tab.id}
+          active={true}
+          mode={tab.mode}
+          title={tab.title}
+          menuState={{
+            now: menuStates.COLLAPSED,
+            before: menuStates.FILES,
+          }}
+          setMenuState={props.setMenuState}
+          widgetHandler={props.widgetHandler}
+          bunker={props.bunker}
+        />
       );
     else setCurrentTabEl(<>empty tab</>);
   }, [props.tabs]);
@@ -107,18 +87,18 @@ export const TabManager = (props: Props) => {
         active: true,
         mode: 'fileview',
         collapsed: false,
-        filePath: './index.md',
+        filePath: null,
       };
     }
     tab.id = getUnusedTabId(props.tabs);
     tab.title = `new tab [${tab.id}]`;
     console.log('created a new tab:', tab);
     props.setTabs([...props.tabs, tab]);
-    setCurrentTab(tab);
+    props.setCurrentTab(tab);
   }
 
   function setActiveTab(id: number) {
-    let aT: tab = currentTab;
+    let aT: tab = props.currentTab;
     let t: tab[] = [];
     for (let i = 0; i < props.tabs.length; i++) {
       let cTab = props.tabs[i];
@@ -128,7 +108,7 @@ export const TabManager = (props: Props) => {
       }
       t.push(cTab);
     }
-    setCurrentTab(aT);
+    props.setCurrentTab(aT);
     props.setTabs(t);
   }
 
@@ -172,25 +152,6 @@ export const TabManager = (props: Props) => {
           .toString()}
       >
         {currentTabEl}
-        {/*props.tabs.map((e, i) => {
-          return (
-            <Tab
-              id={e.id}
-              path={e.filePath}
-              active={e.active}
-              mode={e.mode}
-              title={e.title}
-              menuState={{
-                now: menuStates.FILES,
-                before: menuStates.COLLAPSED,
-              }}
-              setMenuState={props.setMenuState}
-              widgetHandler={props.widgetHandler}
-              bunker={props.bunker}
-              key={e.filePath}
-            />
-          );
-        })*/}
       </div>
     </div>
   );

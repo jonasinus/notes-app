@@ -16,9 +16,10 @@ export function Titlebar({
   setMenuState: Function;
 }) {
   return (
-    <div className="titlebar">
+    <div className={['titlebar', menuStates[menuState.now]].join(' ')}>
       <div className="buttons">
         <button
+          className="toggle"
           onClick={(e) => {
             console.log('menustate rn: ', menuStates[menuState.now]);
             menuState.now === menuStates.COLLAPSED
